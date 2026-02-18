@@ -18,14 +18,28 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collection;
 
+
+
 @Entity
 @Table(name = "DemoUser") //Avoid collision with system table User
-@Data
+@Data //Ens proporciona getters i setters
 @EqualsAndHashCode(callSuper = true)
 public class User extends UriEntity<String> implements UserDetails {
 
+	
+	
 	public static PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+	// TODO Revisar
+	// Prevent clients from assigning roles (especially ADMIN) via JSON when creating users.
+	// The role field is READ_ONLY in JSON, so it can only be set programmatically in the backend.
+	// Admin users can still be created via the /users/admin endpoint, which is protected
+	// and accessible only to users with ADMIN role, enforcing proper access control.
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private Role role;
+	
 	@Id
 	private String id;
 
@@ -39,13 +53,16 @@ public class User extends UriEntity<String> implements UserDetails {
 	@Length(min = 8, max = 256)
 	private String password;
 
+	//Falta afegir columna
+	private boolean enabled = false;
+
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private boolean passwordReset;
 
 	public void encodePassword() {
 		this.password = passwordEncoder.encode(this.password);
 	}
-
+	
 	@Override
 	public String getUsername() { return id; }
 
@@ -55,7 +72,14 @@ public class User extends UriEntity<String> implements UserDetails {
 	@JsonValue(value = false)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER");
+		// Return the user role
+		return AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_"+role.name());
+	}
+
+	public User(){
+		this.enabled = true;
+		// Default ROLE
+		this.role = Role.CREATOR;
 	}
 
 	@Override
@@ -75,6 +99,16 @@ public class User extends UriEntity<String> implements UserDetails {
 
 	@Override
 	public boolean isEnabled() {
-		return true;
+		return enabled;
 	}
+
+	public void suspendCreator(){
+		if(role == Role.CREATOR){
+			this.enabled=false;
+		}
+		else {
+        	throw new IllegalStateException("Only Creators can be suspended");
+    	}
+	}
+
 }
