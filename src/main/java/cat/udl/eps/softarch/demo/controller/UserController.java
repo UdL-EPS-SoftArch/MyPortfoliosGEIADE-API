@@ -21,15 +21,16 @@ public class UserController{
     @PostMapping("/suspend/{id}") //POST users/suspend
     @PreAuthorize("hasRole('ADMIN')")
     public void suspendUser(@PathVariable String id){
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        user.suspendCreator();
-        userRepository.save(user);
+        User user_to_be_suspended = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        user_to_be_suspended.suspendCreator();
+        userRepository.save(user_to_be_suspended);
     }
 
-    @PostMapping("/admins") // POST /users/admin
+    @PostMapping("/admins") // POST /users/admins
     @PreAuthorize("hasRole('ADMIN')")
     public void addAdmin(@RequestBody User user){  //Spring demana els parametres del usuari aixi no cal q les inicilizem
         /*
+        Logic handled by "@RequestBody User user"
         User user = new User();
         user.setId("admin2");
         user.setEmail("admin2@test.com");

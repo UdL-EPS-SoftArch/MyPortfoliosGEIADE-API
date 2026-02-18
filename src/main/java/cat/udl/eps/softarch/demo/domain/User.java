@@ -18,6 +18,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collection;
 
+// CURRENT DESIGN DECISION:
+// We use a single User class with a Role field (CREATOR, ADMIN) instead of
+// creating separate subclasses for each role. This simplifies the model,
+// reduces boilerplate, and keeps role management centralized.
+//
+// RATIONALE:
+// - Roles currently differ mainly in permissions and a few behaviors (e.g., suspending creators, creating admins).
+// - Most attributes and methods are shared, so creating subclasses would add unnecessary complexity.
+// - Role-specific behavior is enforced programmatically in controllers or services.
+//
+// FUTURE EXTENSIBILITY:
+// - If roles grow in complexity (e.g., unique attributes, many exclusive methods),
+//   we could refactor User into a base class and create subclasses for each role (e.g., AdminUser, CreatorUser).
+// - This would encapsulate role-specific logic and allow cleaner polymorphism.
 
 
 @Entity
