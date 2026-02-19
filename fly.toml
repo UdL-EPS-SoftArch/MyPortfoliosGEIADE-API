@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for spring-template on 2025-09-08T00:25:51+02:00
+# fly.toml app configuration file generated for myportfoliosgeiade-api on 2026-02-19T18:23:33+01:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'spring-template'
+app = 'myportfoliosgeiade-api'
 primary_region = 'ams'
 swap_size_mb = 512
 
