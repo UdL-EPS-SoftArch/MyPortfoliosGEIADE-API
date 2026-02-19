@@ -20,8 +20,15 @@ public class Report extends Content {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(unique = true, nullable = false)
-    private String userID;
+    @ManyToOne
+    @JsonIdentityReference(alwaysAsId = true)
+    @Column(nullable = false)
+    private User user;
+
+    @ManyToOne
+    @JsonIdentityReference(alwaysAsId = true)
+    @Column(nullable = false)
+    private Content content;
 
     @org.hibernate.validator.constraints.Length(max = 100)
     @Column(length = 100)

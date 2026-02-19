@@ -21,6 +21,11 @@ public class Content extends UriEntity<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JsonIdentityReference(alwaysAsId = true)
+    @Column(nullable = false)
+    private Project project;
     
     @Column(unique = true, nullable = false)
     private String name;
