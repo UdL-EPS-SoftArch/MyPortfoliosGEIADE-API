@@ -1,11 +1,9 @@
 package cat.udl.eps.softarch.demo.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.time.ZonedDateTime;
+import java.util.HashSet;
 
 @Entity
 public class Tag {
@@ -20,4 +18,7 @@ public class Tag {
     private ZonedDateTime created;
 
     private ZonedDateTime modified;
+
+    //@ManyToMany(mappedBy = "tags")
+    //private Set<Content> contentSet = new HashSet<>();
 }
