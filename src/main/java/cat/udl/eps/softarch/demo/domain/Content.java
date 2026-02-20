@@ -11,6 +11,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+/*
+import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonIdentityReference; */
 
 
 
@@ -22,10 +25,10 @@ public class Content extends UriEntity<Long> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    /*@ManyToOne
     @JsonIdentityReference(alwaysAsId = true)
     @Column(nullable = false)
-    private Project project;
+    private Project project;*/
     
     @Column(unique = true, nullable = false)
     private String name;

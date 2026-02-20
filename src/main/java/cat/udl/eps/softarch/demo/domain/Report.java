@@ -9,13 +9,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
+import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 
 
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Report extends Content {
+public class Report extends UriEntity<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
