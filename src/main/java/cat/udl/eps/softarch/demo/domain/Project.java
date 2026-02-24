@@ -2,16 +2,22 @@ package cat.udl.eps.softarch.demo.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.lang.Nullable;
 
 import java.time.ZonedDateTime;
 
 @Entity
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class Project extends UriEntity<Long> {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     private String name;
 
     private String description;
@@ -27,7 +33,6 @@ public class Project extends UriEntity<Long> {
     //@ManyToOne
     //private Portfolio portfolio;
 
-    // Constructors, Getters i Setters
     public Project() {
         this.created = ZonedDateTime.now();
     }
@@ -38,6 +43,8 @@ public class Project extends UriEntity<Long> {
         return this.id;
     }
 
+    public ZonedDateTime getCreated() { return this.created;}
+
     public void setCreated(ZonedDateTime created) {
         this.created = created;
     }
@@ -45,5 +52,9 @@ public class Project extends UriEntity<Long> {
     public void setModified(ZonedDateTime modified) {
         this.modified = modified;
     }
+
+    public void setName(String name) {this.name = name;}
+
+    public void setDescription(String description) {this.description = description;}
 
 }
