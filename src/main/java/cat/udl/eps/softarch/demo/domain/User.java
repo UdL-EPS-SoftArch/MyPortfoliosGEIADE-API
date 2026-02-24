@@ -36,7 +36,7 @@ import java.util.Collection;
 
 @Entity
 @Table(name = "DemoUser") //Avoid collision with system table User
-@Data //Ens proporciona getters i setters
+@Data 
 @EqualsAndHashCode(callSuper = true)
 public class User extends UriEntity<String> implements UserDetails {
 
@@ -44,15 +44,9 @@ public class User extends UriEntity<String> implements UserDetails {
 	
 	public static PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-	// TODO Revisar
-	// Prevent clients from assigning roles (especially ADMIN) via JSON when creating users.
-	// The role field is READ_ONLY in JSON, so it can only be set programmatically in the backend.
-	// Admin users can still be created via the /users/admin endpoint, which is protected
-	// and accessible only to users with ADMIN role, enforcing proper access control.
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
-	private Role role;
+	private Role role=Role.CREATOR;
 	
 	@Id
 	private String id;
@@ -67,8 +61,8 @@ public class User extends UriEntity<String> implements UserDetails {
 	@Length(min = 8, max = 256)
 	private String password;
 
-	//Falta afegir columna
-	private boolean enabled = false;
+	@Column(nullable = false)
+	private boolean enabled = true;
 
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private boolean passwordReset;
@@ -86,15 +80,12 @@ public class User extends UriEntity<String> implements UserDetails {
 	@JsonValue(value = false)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		// Return the user role
 		return AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_"+role.name());
 	}
-
 	public User(){
-		this.enabled = true;
-		// Default ROLE
-		this.role = Role.CREATOR;
+
 	}
+
 
 	@Override
 	public boolean isAccountNonExpired() {
