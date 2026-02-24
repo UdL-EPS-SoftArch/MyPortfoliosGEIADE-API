@@ -75,7 +75,7 @@ public class User extends UriEntity<String> implements UserDetails {
 	public String getUsername() { return id; }
 
 	public void setUsername(String username) { this.id = username; }
-
+	
 	@Override
 	@JsonValue(value = false)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -85,7 +85,9 @@ public class User extends UriEntity<String> implements UserDetails {
 	public User(){
 
 	}
-
+	public User(Role role){
+		this.role = role;
+	}
 
 	@Override
 	public boolean isAccountNonExpired() {
