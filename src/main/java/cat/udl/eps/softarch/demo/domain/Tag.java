@@ -4,10 +4,10 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.ZonedDateTime;
-import java.util.HashSet;
 
 @Entity
 @Data
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
