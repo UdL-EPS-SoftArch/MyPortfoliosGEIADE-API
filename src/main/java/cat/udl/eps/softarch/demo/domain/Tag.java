@@ -1,11 +1,13 @@
 package cat.udl.eps.softarch.demo.domain;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 
 @Entity
+@Data
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
