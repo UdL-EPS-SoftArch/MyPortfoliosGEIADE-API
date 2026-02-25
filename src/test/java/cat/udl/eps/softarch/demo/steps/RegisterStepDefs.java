@@ -29,6 +29,7 @@ public class RegisterStepDefs {
     this.userRepository = userRepository;
   }
 
+
   @Given("^There is no registered user with username \"([^\"]*)\"$")
   public void thereIsNoRegisteredUserWithUsername(String user) {
     assertFalse(userRepository.existsById(user), "User \"" + user + "\"shouldn't exist");

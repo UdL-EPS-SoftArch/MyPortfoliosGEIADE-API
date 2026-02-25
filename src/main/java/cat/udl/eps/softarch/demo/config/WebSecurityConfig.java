@@ -29,7 +29,7 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests((auth) -> auth
                 .requestMatchers(HttpMethod.GET, "/identity").authenticated()
                 .requestMatchers(HttpMethod.GET, "/users").authenticated()
-                .requestMatchers(HttpMethod.POST, "/users").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/users").authenticated()
                 .requestMatchers(HttpMethod.POST, "/users/*").denyAll()
                 .requestMatchers(HttpMethod.POST, "/*/*").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/*/*").authenticated()
