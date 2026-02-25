@@ -1,0 +1,67 @@
+package cat.udl.eps.softarch.demo.domain;
+
+import java.time.ZonedDateTime;
+
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+//import jakarta.persistence.JoinColumn;
+//import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import lombok.Data;
+//import lombok.EqualsAndHashCode;
+/*
+import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonIdentityReference; */
+import java.util.List;
+
+
+
+@Entity
+@Data
+//@EqualsAndHashCode(callSuper = true)
+public class Content {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long contentId;
+
+    /*@ManyToOne
+    @JsonIdentityReference(alwaysAsId = true)
+    @Column(nullable = false)
+    private Project project;*/
+
+    /*@ManyToOne
+    @JsonIdentityReference(alwaysAsId = true)
+    @Column(nullable = false)
+    private User user;*/
+
+    @OneToMany(mappedBy = "content")
+    @JsonIdentityReference(alwaysAsId = true)
+    private List<Report> reports;
+    
+    @Column(unique = true, nullable = false)
+    private String name;
+
+    @Column(columnDefinition = "TEXT")
+    private String body;
+
+    @org.hibernate.validator.constraints.Length(max = 100)
+    @Column(length = 100)
+    private String description;
+
+    @Column(nullable = false, updatable = false)
+    private ZonedDateTime createdAt;
+
+    @Column(nullable = false, updatable = false)
+    private ZonedDateTime modifiedAt;
+
+    @Enumerated(EnumType.STRING) 
+    @Column(nullable = false) private Visibility visibility;
+    
+}
