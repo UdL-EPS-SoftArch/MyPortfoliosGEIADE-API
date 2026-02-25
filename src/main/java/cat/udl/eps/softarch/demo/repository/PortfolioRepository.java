@@ -17,7 +17,7 @@ public interface PortfolioRepository extends CrudRepository<Portfolio, Long>,
 
     List<Portfolio> findByOwner(@Param("owner") User owner);
 
-    List<Portfolio> findByOwnerUsername(@Param("username") String username);
+    List<Portfolio> findByOwnerId(@Param("id") String id);
 
     List<Portfolio> findByVisibility(@Param("visibility") Visibility visibility);
 
