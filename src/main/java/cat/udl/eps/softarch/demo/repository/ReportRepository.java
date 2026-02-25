@@ -10,8 +10,8 @@ import java.util.List;
 @RepositoryRestResource
 public interface ReportRepository extends CrudRepository<cat.udl.eps.softarch.demo.domain.Report, Long>, PagingAndSortingRepository<Report, Long> {
     // Buscar reportes por usuario
-    List<Report> findByUserId(Long userId);
+    //List<Report> findByUserId(Long userId);
 
     // Buscar reportes por contenido reportado
-    List<Report> findByContentId(Long contentId);
+    List<Report> findByContent_ContentId(Long contentId);
 }
