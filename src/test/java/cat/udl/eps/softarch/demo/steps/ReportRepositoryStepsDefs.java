@@ -34,7 +34,7 @@ public class ReportRepositoryStepsDefs {
 
     }
 
-    @Then("existsById should return true")
+    @Then("Report existsById should return true")
     public void exists_by_id_should_return_true() {
         Assertions.assertTrue(existsResult);
     }

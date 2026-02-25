@@ -14,7 +14,6 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import org.json.JSONObject;
-import org.junit.jupiter.api.Assertions.*;
 import org.springframework.http.MediaType;
 
 import java.nio.charset.StandardCharsets;
