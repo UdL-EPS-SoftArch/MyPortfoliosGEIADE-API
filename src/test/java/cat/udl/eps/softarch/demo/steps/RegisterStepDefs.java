@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import cat.udl.eps.softarch.demo.domain.Role;
 import cat.udl.eps.softarch.demo.domain.User;
 import cat.udl.eps.softarch.demo.repository.UserRepository;
 import io.cucumber.java.en.And;
@@ -108,4 +109,26 @@ public class RegisterStepDefs {
                     .with(AuthenticationStepDefs.authenticate()))
             .andExpect(status().isNotFound());
   }
+
+  
+
+  @When("^I register a new admin with username \"([^\"]*)\", email \"([^\"]*)\" and password \"([^\"]*)\"$")
+  public void iRegisterANewAdmin(String username, String email, String password) throws Throwable {
+
+    User user = new User();
+    user.setId(username);
+    user.setEmail(email);
+    user.setRole(Role.ADMIN);
+
+    stepDefs.result = stepDefs.mockMvc.perform(
+        post("/users")
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(new JSONObject(
+              stepDefs.mapper.writeValueAsString(user)
+          ).put("password", password).toString())
+          .accept(MediaType.APPLICATION_JSON)
+          .with(AuthenticationStepDefs.authenticate())
+        );
+  }
 }
+
