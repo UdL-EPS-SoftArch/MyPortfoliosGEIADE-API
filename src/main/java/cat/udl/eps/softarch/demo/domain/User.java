@@ -15,57 +15,41 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import cat.udl.eps.softarch.demo.domain.Profile;
 
 import java.util.Collection;
 
-// CURRENT DESIGN DECISION:
-// We use a single User class with a Role field (CREATOR, ADMIN) instead of
-// creating separate subclasses for each role. This simplifies the model,
-// reduces boilerplate, and keeps role management centralized.
-//
-// RATIONALE:
-// - Roles currently differ mainly in permissions and a few behaviors (e.g., suspending creators, creating admins).
-// - Most attributes and methods are shared, so creating subclasses would add unnecessary complexity.
-// - Role-specific behavior is enforced programmatically in controllers or services.
-//
-// FUTURE EXTENSIBILITY:
-// - If roles grow in complexity (e.g., unique attributes, many exclusive methods),
-//   we could refactor User into a base class and create subclasses for each role (e.g., AdminUser, CreatorUser).
-// - This would encapsulate role-specific logic and allow cleaner polymorphism.
-
-
 @Entity
 @Table(name = "DemoUser") //Avoid collision with system table User
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "dtype")
 @Data 
 @EqualsAndHashCode(callSuper = true)
 public class User extends UriEntity<String> implements UserDetails {
 
 	
-	
+
 	public static PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-	@Column(nullable = false)
-	@Enumerated(EnumType.STRING)
-	private Role role=Role.CREATOR;
-	
-	@Id
-	private String id;
 
+	@Id
+	protected String id;
+	
 	@NotBlank
 	@Email
 	@Column(unique = true)
-	private String email;
+	protected String email;
 
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@NotBlank
 	@Length(min = 8, max = 256)
-	private String password;
+	protected String password;
 
 	@Column(nullable = false)
-	private boolean enabled = true;
+	protected boolean enabled = true;
 
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	private boolean passwordReset;
+	protected boolean passwordReset;
 
 	public void encodePassword() {
 		this.password = passwordEncoder.encode(this.password);
@@ -80,13 +64,10 @@ public class User extends UriEntity<String> implements UserDetails {
 	@JsonValue(value = false)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_"+role.name());
+		return AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER");
 	}
 	public User(){
 
-	}
-	public User(Role role){
-		this.role = role;
 	}
 
 	@Override
@@ -107,12 +88,6 @@ public class User extends UriEntity<String> implements UserDetails {
 	@Override
 	public boolean isEnabled() {
 		return enabled;
-	}
-
-	public void suspendCreator(){
-		if(role == Role.CREATOR){
-			this.enabled=false;
-		}
 	}
 
 }

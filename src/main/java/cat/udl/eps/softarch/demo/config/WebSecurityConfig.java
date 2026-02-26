@@ -30,11 +30,34 @@ public class WebSecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/identity").authenticated()
 
                 // Users
+                /*
                 .requestMatchers(HttpMethod.GET, "/users").authenticated()
                 .requestMatchers(HttpMethod.POST, "/users").anonymous()
-                .requestMatchers(HttpMethod.GET, "/users/{username}").anonymous() // TODO Canviar a authenticated
-                .requestMatchers(HttpMethod.POST, "/users/{username}/suspend").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/users/*").denyAll()
+                .requestMatchers(HttpMethod.GET, "/users/{username}").anonymous() 
+                .requestMatchers(HttpMethod.POST, "/users/*").denyAll() */
+
+                //Admins
+                .requestMatchers(HttpMethod.GET, "/admins").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/admins").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/admins/{username}").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/admins/{username}/suspend").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/admins/*").denyAll()
+
+                //Creators
+                .requestMatchers(HttpMethod.GET, "/creators").permitAll()
+                .requestMatchers(HttpMethod.POST, "/creators").anonymous()
+                .requestMatchers(HttpMethod.GET, "/creators/{username}").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/creators/{username}").hasRole("ADMIN")  
+                .requestMatchers(HttpMethod.POST, "/creators/*").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/creators/{username}/suspend").hasRole("ADMIN")
+
+                //Profile
+                .requestMatchers(HttpMethod.GET, "/profiles").permitAll()
+                .requestMatchers(HttpMethod.POST, "/profiles").hasRole("CREATOR")
+                .requestMatchers(HttpMethod.GET, "/profiles/{username}").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/profiles/{username}").hasRole("CREATOR")  
+                .requestMatchers(HttpMethod.POST, "/profiles/*").hasRole("ADMIN")
+
 
 
                 .requestMatchers(HttpMethod.POST, "/*/*").authenticated()
