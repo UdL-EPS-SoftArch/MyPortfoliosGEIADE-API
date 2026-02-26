@@ -113,9 +113,6 @@ public class User extends UriEntity<String> implements UserDetails {
 		if(role == Role.CREATOR){
 			this.enabled=false;
 		}
-		else {
-        	throw new IllegalStateException("Only Creators can be suspended");
-    	}
 	}
 
 }

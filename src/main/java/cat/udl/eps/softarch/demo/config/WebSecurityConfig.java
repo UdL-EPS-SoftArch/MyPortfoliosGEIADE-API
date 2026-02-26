@@ -28,9 +28,15 @@ public class WebSecurityConfig {
     protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((auth) -> auth
                 .requestMatchers(HttpMethod.GET, "/identity").authenticated()
+
+                // Users
                 .requestMatchers(HttpMethod.GET, "/users").authenticated()
-                .requestMatchers(HttpMethod.POST, "/users").authenticated()
+                .requestMatchers(HttpMethod.POST, "/users").anonymous()
+                .requestMatchers(HttpMethod.GET, "/users/{username}").anonymous() // TODO Canviar a authenticated
+                .requestMatchers(HttpMethod.POST, "/users/{username}/suspend").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/users/*").denyAll()
+
+
                 .requestMatchers(HttpMethod.POST, "/*/*").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/*/*").authenticated()
                 .requestMatchers(HttpMethod.PATCH, "/*/*").authenticated()

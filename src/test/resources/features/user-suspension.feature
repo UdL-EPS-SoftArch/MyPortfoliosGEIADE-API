@@ -3,14 +3,30 @@ Feature: Suspend Creator User
   As an ADMIN
   I want to suspend a CREATOR
 
-  Scenario: Suspend a CREATOR successfully
-    Given There is a registered user with username "creator1" and password "password123" and email "creator1@sample.app"
+  Scenario: Anonymous cannot suspend a creator
+    Given there is a registered creator with username "creator1", email "creator1@test.com" and password "abcd"
+    When I attempt to suspend the user "creator1" as an anonymous user
+    Then The error message is "Unauthorized"
+    And The user "creator1" is still enabled
+
+  Scenario: Creator cannot suspend another creator
+    Given there is a registered creator with username "creator1", email "creator1@test.com" and password "abcd"
+    And I login as "creator1" with password "abcd"
+    When I attempt to suspend the user "creator1"
+    Then The error message is "Forbidden"
+    And The user "creator1" is still enabled
+
+  Scenario: Admin suspends a creator successfully
+    Given there is a registered creator with username "creator1", email "creator1@test.com" and password "abcd"
+    And there is a registered admin with username "admin1", email "admin1@test.com" and password "1234"
+    And I login as "admin1" with password "1234"
     When I suspend the user "creator1"
     Then The user "creator1" is disabled
-    And I cannot login with username "creator1" and password "password123"
 
-  Scenario: Suspend an ADMIN (should fail)
-    Given There is a registered admin with username "admin1" and password "adminpass" and email "admin1@sample.app"
-    When I attempt to suspend the user "admin1"
-    Then I get an error "Only Creators can be suspended"
-    And The user "admin1" is still enabled
+  Scenario: Admin cannot suspend another admin
+    Given there is a registered admin with username "admin2", email "admin2@test.com" and password "abcd"
+    And there is a registered admin with username "admin1", email "admin1@test.com" and password "1234"
+    And I login as "admin1" with password "1234"
+    When I attempt to suspend the user "admin2"
+    Then The error message is "Cannot suspend an admin"
+    And The user "admin2" is still enabled

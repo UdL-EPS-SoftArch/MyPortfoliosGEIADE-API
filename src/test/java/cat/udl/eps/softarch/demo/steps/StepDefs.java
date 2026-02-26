@@ -50,6 +50,7 @@ public class StepDefs {
     }
 
     // Like BeforeEach in JUnit, runs before each scenario. 
+    @Before
     public void setup() {
         this.mockMvc = MockMvcBuilders
                 .webAppContextSetup(this.wac)
