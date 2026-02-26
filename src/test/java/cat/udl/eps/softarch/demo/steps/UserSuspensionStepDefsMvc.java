@@ -1,17 +1,14 @@
 package cat.udl.eps.softarch.demo.steps;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import cat.udl.eps.softarch.demo.domain.Role;
-import cat.udl.eps.softarch.demo.domain.User;
-import cat.udl.eps.softarch.demo.repository.UserRepository;
-import io.cucumber.java.en.And;
+import cat.udl.eps.softarch.demo.domain.Admin;
+import cat.udl.eps.softarch.demo.domain.Creator;
+import cat.udl.eps.softarch.demo.repository.CreatorRepository;
+import cat.udl.eps.softarch.demo.repository.AdminRepository;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -20,73 +17,75 @@ import org.springframework.http.MediaType;
 public class UserSuspensionStepDefsMvc {
 
     private final StepDefs stepDefs;
-    private final UserRepository userRepository;
+    private final CreatorRepository creatorRepository;
+    private final AdminRepository adminRepository;
 
-    public UserSuspensionStepDefsMvc(StepDefs stepDefs, UserRepository userRepository) {
+    public UserSuspensionStepDefsMvc(StepDefs stepDefs, CreatorRepository creatorRepository, AdminRepository adminRepository) {
         this.stepDefs = stepDefs;
-        this.userRepository = userRepository;
+        this.creatorRepository = creatorRepository;
+        this.adminRepository = adminRepository;
     }
 
-
+    // ----------------- Given -----------------
     @Given("there is a registered creator with username {string}, email {string} and password {string}")
     public void thereIsARegisteredCreator(String username, String email, String password) {
-        if (!userRepository.existsById(username)) {
-            User user = new User(Role.CREATOR);
-            user.setId(username);
-            user.setEmail(email);
-            user.setPassword(password);
-            user.encodePassword();
-            userRepository.save(user);
+        if (!creatorRepository.existsById(username)) {
+            Creator creator = new Creator();
+            creator.setUsername(username);
+            creator.setEmail(email);
+            creator.setPassword(password);
+            creator.encodePassword();
+            creatorRepository.save(creator);
         }
     }
 
-    @Given("There is a registered admin with username {string} and password {string} and email {string}")
-    public void thereIsARegisteredAdmin(String username, String password, String email) {
-        if (!userRepository.existsById(username)) {
-            User user = new User(Role.ADMIN);
-            user.setId(username);
-            user.setEmail(email);
-            user.setPassword(password);
-            user.encodePassword();
-            userRepository.save(user);
+    @Given("There is a registered admin with username {string}, email {string} and password {string}")
+    public void thereIsARegisteredAdmin(String username, String email, String password) {
+        if (!adminRepository.existsById(username)) {
+            Admin admin = new Admin();
+            admin.setUsername(username);
+            admin.setEmail(email);
+            admin.setPassword(password);
+            admin.encodePassword();
+            adminRepository.save(admin);
         }
     }
 
-
-    @When("I suspend the user {string}")
-    public void iSuspendTheUser(String username) throws Exception {
+    // ----------------- When -----------------
+    @When("I suspend the creator {string}")
+    public void iSuspendTheCreator(String username) throws Exception {
         stepDefs.result = stepDefs.mockMvc.perform(
-                post("/users/{username}/suspend", username)
+                post("/creators/{username}/suspend", username)
                         .with(AuthenticationStepDefs.authenticate())
         );
     }
 
-    @When("I attempt to suspend the user {string}")
-    public void iAttemptToSuspendUser(String username) throws Exception {
-        iSuspendTheUser(username);
+    @When("I attempt to suspend the creator {string}")
+    public void iAttemptToSuspendCreator(String username) throws Exception {
+        iSuspendTheCreator(username);
     }
 
-    @When("I attempt to suspend the user {string} as an anonymous user")
-    public void iAttemptToSuspendUserAnonymous(String username) throws Exception {
+    @When("I attempt to suspend the creator {string} as an anonymous user")
+    public void iAttemptToSuspendCreatorAnonymous(String username) throws Exception {
         stepDefs.result = stepDefs.mockMvc.perform(
-                post("/users/{username}/suspend", username)
+                post("/creators/{username}/suspend", username)
         );
     }
 
-
-    @Then("The user {string} is disabled")
-    public void theUserIsDisabled(String username) throws Exception {
+    // ----------------- Then -----------------
+    @Then("The creator {string} is disabled")
+    public void theCreatorIsDisabled(String username) throws Exception {
         stepDefs.result = stepDefs.mockMvc.perform(
-                get("/users/{username}", username)
+                get("/creators/{username}", username)
                         .accept(MediaType.APPLICATION_JSON)
                         .with(AuthenticationStepDefs.authenticate())
         ).andExpect(jsonPath("$.enabled", is(false)));
     }
 
-    @Then("The user {string} is still enabled")
-    public void theUserIsStillEnabled(String username) throws Exception { // TODO Revisar per fer controller
+    @Then("The creator {string} is still enabled")
+    public void theCreatorIsStillEnabled(String username) throws Exception {
         stepDefs.result = stepDefs.mockMvc.perform(
-                get("/users/{username}", username)
+                get("/creators/{username}", username)
                         .accept(MediaType.APPLICATION_JSON)
                         .with(AuthenticationStepDefs.authenticate())
         ).andExpect(jsonPath("$.enabled", is(true)));

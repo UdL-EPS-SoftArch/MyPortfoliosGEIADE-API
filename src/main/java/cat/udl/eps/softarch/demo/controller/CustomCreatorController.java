@@ -10,16 +10,15 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
 @RepositoryRestController
-@RequestMapping("/creators")
-public class CreatorController {
+public class CustomCreatorController {
 
     private CreatorRepository creatorRepository;
-    public CreatorController(CreatorRepository creatorRepository){
+    public CustomCreatorController(CreatorRepository creatorRepository){
         this.creatorRepository = creatorRepository;
     }
 
     // PUT creators/username
-    @PutMapping("/{username}")
+    @PutMapping("/creators/{username}")
     @PreAuthorize("@creatorSecurity.isOwner(principal.username, #username)")
     public ResponseEntity<Creator> updateCreator(@PathVariable String username,
                                                  @RequestBody Creator updated) {
@@ -38,7 +37,7 @@ public class CreatorController {
         return ResponseEntity.ok(creator);
     }
     
-    @PostMapping("/{username}/suspend")
+    @PostMapping("/creators/{username}/suspend")
     public ResponseEntity<Creator> suspendCreator (@PathVariable String username) {
 
             Creator creator = creatorRepository.findById(username)

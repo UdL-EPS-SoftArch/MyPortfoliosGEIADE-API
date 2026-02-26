@@ -8,129 +8,116 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import cat.udl.eps.softarch.demo.domain.Role;
-import cat.udl.eps.softarch.demo.domain.User;
-import cat.udl.eps.softarch.demo.repository.UserRepository;
+import cat.udl.eps.softarch.demo.domain.Admin;
+import cat.udl.eps.softarch.demo.domain.Creator;
+import cat.udl.eps.softarch.demo.repository.AdminRepository;
+import cat.udl.eps.softarch.demo.repository.CreatorRepository;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import org.json.JSONObject;
-import org.junit.jupiter.api.Assertions.*;
 import org.springframework.http.MediaType;
 
 import java.nio.charset.StandardCharsets;
 
 public class RegisterStepDefs {
-  private final StepDefs stepDefs;
-  private final UserRepository userRepository;
 
-  public RegisterStepDefs(StepDefs stepDefs, UserRepository userRepository) {
-    this.stepDefs = stepDefs;
-    this.userRepository = userRepository;
-  }
+    private final StepDefs stepDefs;
+    private final CreatorRepository creatorRepository;
+    private final AdminRepository adminRepository;
 
-
-  @Given("^There is no registered user with username \"([^\"]*)\"$")
-  public void thereIsNoRegisteredUserWithUsername(String user) {
-    assertFalse(userRepository.existsById(user), "User \"" + user + "\"shouldn't exist");
-  }
-
-  @Given("^There is a registered user with username \"([^\"]*)\" and password \"([^\"]*)\" and email \"([^\"]*)\"$")
-  public void thereIsARegisteredUserWithUsernameAndPasswordAndEmail(String username, String password, String email) {
-    if (!userRepository.existsById(username)) {
-      User user = new User();
-      user.setEmail(email);
-      user.setId(username);
-      user.setPassword(password);
-      user.encodePassword();
-      userRepository.save(user);
+    public RegisterStepDefs(StepDefs stepDefs, CreatorRepository creatorRepository, AdminRepository adminRepository) {
+        this.stepDefs = stepDefs;
+        this.creatorRepository = creatorRepository;
+        this.adminRepository = adminRepository;
     }
-  }
 
-  @And("^I can login with username \"([^\"]*)\" and password \"([^\"]*)\"$")
-  public void iCanLoginWithUsernameAndPassword(String username, String password) throws Throwable {
-    AuthenticationStepDefs.currentUsername = username;
-    AuthenticationStepDefs.currentPassword = password;
+    // ----------------- GIVEN -----------------
+    @Given("^There is no registered creator with username \"([^\"]*)\"$")
+    public void thereIsNoRegisteredCreatorWithUsername(String username) {
+        assertFalse(creatorRepository.existsById(username), "Creator \"" + username + "\" shouldn't exist");
+    }
 
-    stepDefs.result = stepDefs.mockMvc.perform(
-        get("/identity", username)
-            .accept(MediaType.APPLICATION_JSON)
-            .with(AuthenticationStepDefs.authenticate()))
-        .andDo(print())
-        .andExpect(status().isOk());
-  }
+    @Given("^There is a registered creator with username \"([^\"]*)\" and password \"([^\"]*)\" and email \"([^\"]*)\"$")
+    public void thereIsARegisteredCreator(String username, String password, String email) {
+        if (!creatorRepository.existsById(username)) {
+            Creator creator = new Creator();
+            creator.setUsername(username);
+            creator.setEmail(email);
+            creator.setPassword(password);
+            creator.encodePassword();
+            creatorRepository.save(creator);
+        }
+    }
 
-  @And("^I cannot login with username \"([^\"]*)\" and password \"([^\"]*)\"$")
-  public void iCannotLoginWithUsernameAndPassword(String username, String password) throws Throwable {
-    AuthenticationStepDefs.currentUsername = username;
-    AuthenticationStepDefs.currentPassword = password;
+    @Given("^There is a registered admin with username \"([^\"]*)\" and password \"([^\"]*)\" and email \"([^\"]*)\"$")
+    public void thereIsARegisteredAdmin(String username, String password, String email) {
+        if (!adminRepository.existsById(username)) {
+            Admin admin = new Admin();
+            admin.setUsername(username);
+            admin.setEmail(email);
+            admin.setPassword(password);
+            admin.encodePassword();
+            adminRepository.save(admin);
+        }
+    }
 
-    stepDefs.result = stepDefs.mockMvc.perform(
-        get("/identity", username)
-            .accept(MediaType.APPLICATION_JSON)
-            .with(AuthenticationStepDefs.authenticate()))
-        .andDo(print())
-        .andExpect(status().isUnauthorized());
-  }
+    // ----------------- WHEN -----------------
+    @When("^I register a new creator with username \"([^\"]*)\", email \"([^\"]*)\" and password \"([^\"]*)\"$")
+    public void iRegisterANewCreator(String username, String email, String password) throws Exception {
+        Creator creator = new Creator();
+        creator.setUsername(username);
+        creator.setEmail(email);
+        creator.setPassword(password);
 
-  @When("^I register a new user with username \"([^\"]*)\", email \"([^\"]*)\" and password \"([^\"]*)\"$")
-  public void iRegisterANewUserWithUsernameEmailAndPassword(String username, String email, String password) throws Throwable {
-    User user = new User();
-    user.setId(username);
-    user.setEmail(email);
-    user.setPassword(password);
+        stepDefs.result = stepDefs.mockMvc.perform(
+                post("/creators")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new JSONObject(stepDefs.mapper.writeValueAsString(creator))
+                                .put("password", password)
+                                .toString())
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(AuthenticationStepDefs.authenticate()))
+                .andDo(print());
+    }
 
-    stepDefs.result = stepDefs.mockMvc.perform(
-            post("/users")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(new JSONObject(
-                            stepDefs.mapper.writeValueAsString(user)
-                    ).put("password", password).toString())
-                    .characterEncoding(StandardCharsets.UTF_8)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .with(AuthenticationStepDefs.authenticate()))
-            .andDo(print());
-  }
+    @When("^I register a new admin with username \"([^\"]*)\", email \"([^\"]*)\" and password \"([^\"]*)\"$")
+    public void iRegisterANewAdmin(String username, String email, String password) throws Exception {
+        Admin admin = new Admin();
+        admin.setUsername(username);
+        admin.setEmail(email);
+        admin.setPassword(password);
 
-  @And("^It has been created a user with username \"([^\"]*)\" and email \"([^\"]*)\", the password is not returned$")
-  public void itHasBeenCreatedAUserWithUsername(String username, String email) throws Throwable {
-    stepDefs.result = stepDefs.mockMvc.perform(
-            get("/users/{username}", username)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .with(AuthenticationStepDefs.authenticate()))
-            .andDo(print())
-            .andExpect(jsonPath("$.email", is(email)))
-            .andExpect(jsonPath("$.password").doesNotExist());
-  }
+        stepDefs.result = stepDefs.mockMvc.perform(
+                post("/admins")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new JSONObject(stepDefs.mapper.writeValueAsString(admin))
+                                .put("password", password)
+                                .toString())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(AuthenticationStepDefs.authenticate()))
+                .andDo(print());
+    }
 
-  @And("^It has not been created a user with username \"([^\"]*)\"$")
-  public void itHasNotBeenCreatedAUserWithUsername(String username) throws Throwable {
-    stepDefs.result = stepDefs.mockMvc.perform(
-            get("/users/{username}", username)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .with(AuthenticationStepDefs.authenticate()))
-            .andExpect(status().isNotFound());
-  }
+    // ----------------- THEN / AND -----------------
+    @And("^It has been created a creator with username \"([^\"]*)\" and email \"([^\"]*)\", the password is not returned$")
+    public void itHasBeenCreatedACreator(String username, String email) throws Exception {
+        stepDefs.result = stepDefs.mockMvc.perform(
+                get("/creators/{username}", username)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(AuthenticationStepDefs.authenticate()))
+                .andDo(print())
+                .andExpect(jsonPath("$.email", is(email)))
+                .andExpect(jsonPath("$.password").doesNotExist());
+    }
 
-  
-
-  @When("^I register a new admin with username \"([^\"]*)\", email \"([^\"]*)\" and password \"([^\"]*)\"$")
-  public void iRegisterANewAdmin(String username, String email, String password) throws Throwable {
-
-    User user = new User();
-    user.setId(username);
-    user.setEmail(email);
-    user.setRole(Role.ADMIN);
-
-    stepDefs.result = stepDefs.mockMvc.perform(
-        post("/users")
-          .contentType(MediaType.APPLICATION_JSON)
-          .content(new JSONObject(
-              stepDefs.mapper.writeValueAsString(user)
-          ).put("password", password).toString())
-          .accept(MediaType.APPLICATION_JSON)
-          .with(AuthenticationStepDefs.authenticate())
-        );
-  }
+    @And("^It has not been created a creator with username \"([^\"]*)\"$")
+    public void itHasNotBeenCreatedACreator(String username) throws Exception {
+        stepDefs.result = stepDefs.mockMvc.perform(
+                get("/creators/{username}", username)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(AuthenticationStepDefs.authenticate()))
+                .andExpect(status().isNotFound());
+    }
 }
-
