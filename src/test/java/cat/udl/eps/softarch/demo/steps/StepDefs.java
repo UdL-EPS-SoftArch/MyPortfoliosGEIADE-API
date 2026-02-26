@@ -40,16 +40,16 @@ import org.springframework.web.context.WebApplicationContext;
 @CucumberContextConfiguration
 public class StepDefs {
 
-    protected final WebApplicationContext wac;
-    protected MockMvc mockMvc;
-    protected ResultActions result;
-    protected ObjectMapper mapper = new ObjectMapper();
+    protected final WebApplicationContext wac; // Provides access to the Spring application context for testing
+    protected MockMvc mockMvc; // Permits performing HTTP requests in tests
+    protected ResultActions result; // Stores the result of a request to assert on it later.
+    protected ObjectMapper mapper = new ObjectMapper(); // Converts objects JAVA <-> JSON
 
     public StepDefs(WebApplicationContext wac) {
         this.wac = wac;
     }
 
-    @Before
+    // Like BeforeEach in JUnit, runs before each scenario. 
     public void setup() {
         this.mockMvc = MockMvcBuilders
                 .webAppContextSetup(this.wac)

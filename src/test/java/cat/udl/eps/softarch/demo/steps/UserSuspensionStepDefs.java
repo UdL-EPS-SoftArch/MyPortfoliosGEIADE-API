@@ -18,6 +18,7 @@ public class UserSuspensionStepDefs {
     public UserSuspensionStepDefs(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
+    //TODO Modificar fent us de StepDefs utilitzant MockMvc per fer les peticions HTTP a l'API en comptes de modificar directament la base de dades. Això permet provar també les capes de seguretat i validació de l'API.
     @Given("There is a registered admin with username {string} and password {string} and email {string}")
     public void thereIsARegisteredAdmin(String username, String password, String email) {
         if (!userRepository.existsById(username)) {
