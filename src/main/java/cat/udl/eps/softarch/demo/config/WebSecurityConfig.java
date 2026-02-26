@@ -45,11 +45,11 @@ public class WebSecurityConfig {
 
                 //Creators
                 .requestMatchers(HttpMethod.GET, "/creators").permitAll()
-                .requestMatchers(HttpMethod.POST, "/creators").anonymous()
+                .requestMatchers(HttpMethod.POST, "/creators").permitAll()
                 .requestMatchers(HttpMethod.GET, "/creators/{username}").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/creators/{username}").hasRole("ADMIN")  
                 .requestMatchers(HttpMethod.POST, "/creators/*").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/creators/{username}/suspend").hasRole("ADMIN")
+                //.requestMatchers(HttpMethod.POST, "/creators/{username}/suspend").hasRole("ADMIN")
 
                 //Profile
                 .requestMatchers(HttpMethod.GET, "/profiles").permitAll()

@@ -11,5 +11,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 @RepositoryRestResource
 public interface CreatorRepository extends CrudRepository< Creator, String>, PagingAndSortingRepository<Creator, String> {
+    long countById(String id);
 
+    long countByEmail(String email);
 }
