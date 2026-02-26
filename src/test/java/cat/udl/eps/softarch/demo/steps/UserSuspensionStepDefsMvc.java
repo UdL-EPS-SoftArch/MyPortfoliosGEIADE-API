@@ -25,19 +25,9 @@ public class UserSuspensionStepDefsMvc {
         this.creatorRepository = creatorRepository;
         this.adminRepository = adminRepository;
     }
-
+    // TODO Arreglar
     // ----------------- Given -----------------
-    @Given("there is a registered creator with username {string}, email {string} and password {string}")
-    public void thereIsARegisteredCreator(String username, String email, String password) {
-        if (!creatorRepository.existsById(username)) {
-            Creator creator = new Creator();
-            creator.setUsername(username);
-            creator.setEmail(email);
-            creator.setPassword(password);
-            creator.encodePassword();
-            creatorRepository.save(creator);
-        }
-    }
+   
 
     @Given("There is a registered admin with username {string}, email {string} and password {string}")
     public void thereIsARegisteredAdmin(String username, String email, String password) {
