@@ -3,6 +3,8 @@ package cat.udl.eps.softarch.demo.steps;
 import cat.udl.eps.softarch.demo.domain.Report;
 import cat.udl.eps.softarch.demo.domain.Content;
 import cat.udl.eps.softarch.demo.repository.ReportRepository;
+import cat.udl.eps.softarch.demo.repository.ContentRepository;
+import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.*;
 import org.junit.jupiter.api.Assertions;
 
@@ -11,6 +13,11 @@ public class ReportRepositoryStepsDefs {
     private final ReportRepository reportRepository;
     private boolean existsResult;
     private Long createdReportId;
+    private ContentRepository contentRepository;
+
+    @ParameterType(".*") public Content content(String name) {
+        return this.contentRepository.findByName(name).orElseThrow(() -> new RuntimeException("Content not found"));
+    }
 
     public ReportRepositoryStepsDefs(ReportRepository reportRepository) {
         this.reportRepository = reportRepository;
@@ -31,7 +38,6 @@ public class ReportRepositoryStepsDefs {
         Report saved = reportRepository.save(report);
         createdReportId = saved.getReportId();
         existsResult = reportRepository.existsById(createdReportId);
-
     }
 
     @Then("Report existsById should return true")
