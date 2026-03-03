@@ -16,6 +16,8 @@ public interface ContentRepository extends CrudRepository<cat.udl.eps.softarch.d
 
     boolean existsByName(String name);
 
+    
+
     //List<Content> findByProjectId(Long projectId);
 
     //List<Content> findByProjectIdAndVisibility(Long projectId, Visibility visibility);
