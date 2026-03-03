@@ -1,51 +1,142 @@
 package cat.udl.eps.softarch.demo.steps;
 
 import cat.udl.eps.softarch.demo.domain.Project;
+import cat.udl.eps.softarch.demo.domain.Visibility;
+import cat.udl.eps.softarch.demo.repository.ProjectRepository;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 
-import java.time.ZonedDateTime;
+import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 public class ManageProjectStepDefs {
-    private Project project;
-    private ResponseEntity<Project> response;
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+    private final StepDefs stepDefs;
+    private final ProjectRepository projectRepository;
+    private Project preparedProject;
 
-    @Given("that I want to create a project with the name {string} and the description {string}")
-    public void prepareProject(String name, String desc) {
-        project = new Project();
-        project.setName(name);
-        project.setDescription(desc);
+    public ManageProjectStepDefs(StepDefs stepDefs, ProjectRepository projectRepository) {
+        this.stepDefs = stepDefs;
+        this.projectRepository = projectRepository;
+        this.stepDefs.mapper.registerModule(new JavaTimeModule());
     }
 
-    @When("I send the create request")
-    public void sendRequest() {
-        response = restTemplate.postForEntity("/projects", project, Project.class);
+    // ===================== GIVEN =====================
+
+    @Given("I prepare a project with name {string} and description {string} and visibility {string}")
+    public void iPrepareAProject(String name, String description, String visibility) {
+        preparedProject = new Project();
+        preparedProject.setName(name);
+        preparedProject.setDescription(description);
+        preparedProject.setVisibility(Visibility.valueOf(visibility));
     }
 
-    @Then("The project should be saved correctly")
-    public void verifyIfSaved() {
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    @And("There is a project with name {string} and description {string} and visibility {string}")
+    public void thereIsAProject(String name, String description, String visibility) {
+        Project p = new Project();
+        p.setName(name);
+        p.setDescription(description);
+        p.setVisibility(Visibility.valueOf(visibility));
+        projectRepository.save(p);
     }
 
-    @Then("the data of creation \"created\" should be correct")
-    public void verifyCreationDate() {
-        Project savedProject = response.getBody();
+    // ===================== WHEN =====================
 
-        assertNotNull(savedProject, "El cos de la resposta no hauria de ser buit");
+    @When("I send the create project request")
+    public void iSendTheCreateProjectRequest() throws Exception {
+        stepDefs.result = stepDefs.mockMvc.perform(
+                post("/projects")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(stepDefs.mapper.writeValueAsString(preparedProject))
+                    .characterEncoding(StandardCharsets.UTF_8)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(AuthenticationStepDefs.authenticate()))
+            .andDo(print());
+    }
 
-        assertNotNull(savedProject.getCreated(), "La data de creació s'hauria d'haver generat");
+    @When("I retrieve the project named {string}")
+    public void iRetrieveTheProjectNamed(String name) throws Exception {
+        Project found = projectRepository.findByNameContaining(name)
+            .stream().filter(p -> p.getName().equals(name))
+            .findFirst().orElseThrow();
 
-        assertTrue(savedProject.getCreated().isBefore(ZonedDateTime.now().plusSeconds(1)),
-            "La data de creació hauria de ser d'ara mateix");
+        stepDefs.result = stepDefs.mockMvc.perform(
+                get("/projects/{id}", found.getId())
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(AuthenticationStepDefs.authenticate()))
+            .andDo(print());
+    }
+
+    @When("I retrieve the project with id {long}")
+    public void iRetrieveTheProjectWithId(Long id) throws Exception {
+        stepDefs.result = stepDefs.mockMvc.perform(
+                get("/projects/{id}", id)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(AuthenticationStepDefs.authenticate()))
+            .andDo(print());
+    }
+
+    @When("I update the project named {string} with new name {string}")
+    public void iUpdateTheProjectNamed(String oldName, String newName) throws Exception {
+        Project found = projectRepository.findByNameContaining(oldName)
+            .stream().filter(p -> p.getName().equals(oldName))
+            .findFirst().orElseThrow();
+
+        found.setName(newName);
+
+        stepDefs.result = stepDefs.mockMvc.perform(
+                put("/projects/{id}", found.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(stepDefs.mapper.writeValueAsString(found))
+                    .characterEncoding(StandardCharsets.UTF_8)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(AuthenticationStepDefs.authenticate()))
+            .andDo(print());
+    }
+
+    @When("I delete the project named {string}")
+    public void iDeleteTheProjectNamed(String name) throws Exception {
+        Project found = projectRepository.findByNameContaining(name)
+            .stream().filter(p -> p.getName().equals(name))
+            .findFirst().orElseThrow();
+
+        stepDefs.result = stepDefs.mockMvc.perform(
+                delete("/projects/{id}", found.getId())
+                    .with(AuthenticationStepDefs.authenticate()))
+            .andDo(print());
+    }
+
+    @When("I delete the project with id {long}")
+    public void iDeleteTheProjectWithId(Long id) throws Exception {
+        stepDefs.result = stepDefs.mockMvc.perform(
+                delete("/projects/{id}", id)
+                    .with(AuthenticationStepDefs.authenticate()))
+            .andDo(print());
+    }
+
+    // ===================== THEN / AND =====================
+
+    @Then("The project name is {string}")
+    public void theProjectNameIs(String name) throws Exception {
+        stepDefs.result.andExpect(jsonPath("$.name", is(name)));
+    }
+
+    @Then("The project creation date should be set")
+    public void theProjectCreationDateShouldBeSet() throws Exception {
+        stepDefs.result.andExpect(jsonPath("$.created", notNullValue()));
+    }
+
+    @Then("The project visibility should be {string}")
+    public void theProjectVisibilityShouldBe(String visibility) throws Exception {
+        stepDefs.result.andExpect(jsonPath("$.visibility", is(visibility)));
     }
 }
