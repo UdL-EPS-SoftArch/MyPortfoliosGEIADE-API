@@ -13,14 +13,19 @@ public class ReportRepositoryStepsDefs {
     private final ReportRepository reportRepository;
     private boolean existsResult;
     private Long createdReportId;
-    private ContentRepository contentRepository;
+    private final ContentRepository contentRepository;
 
     @ParameterType(".*") public Content content(String name) {
         return this.contentRepository.findByName(name).orElseThrow(() -> new RuntimeException("Content not found"));
     }
 
-    public ReportRepositoryStepsDefs(ReportRepository reportRepository) {
+    @ParameterType("\\d+") public Long Long(String value) {
+        return Long.valueOf(value);
+    }
+
+    public ReportRepositoryStepsDefs(ReportRepository reportRepository, ContentRepository contentRepository) {
         this.reportRepository = reportRepository;
+        this.contentRepository = contentRepository;
     }
 
     @Given("there are no Reports in the system")
