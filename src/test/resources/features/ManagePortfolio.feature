@@ -64,3 +64,13 @@ Feature: Manage Portfolio
     Given I'm not logged in
     When I create a new portfolio with name "My Portfolio"
     Then The response code is 401
+
+  Scenario: Cannot update another user's portfolio
+    Given There is a registered user with username "user1" and password "password" and email "user1@sample.app"
+    And There is a registered user with username "user2" and password "password" and email "user2@sample.app"
+    And I login as "user1" with password "password"
+    And I create a new portfolio with name "User1Portfolio"
+    And I logout
+    And I login as "user2" with password "password"
+    When I try to update the portfolio name to "HackedPortfolio"
+    Then The response code is 403
