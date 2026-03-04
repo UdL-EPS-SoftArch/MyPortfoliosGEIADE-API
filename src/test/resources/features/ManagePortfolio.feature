@@ -53,3 +53,9 @@ Feature: Manage Portfolio
     And I login as "user2" with password "password"
     When I try to delete portfolio "User1Portfolio"
     Then The response code is 403
+
+  Scenario: Create portfolio with empty name
+    Given There is a registered user with username "user" and password "password" and email "user@sample.app"
+    And I login as "user" with password "password"
+    When I create a new portfolio with name ""
+    Then The response code is 400
