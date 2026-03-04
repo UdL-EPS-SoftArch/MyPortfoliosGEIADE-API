@@ -43,3 +43,13 @@ Feature: Manage Portfolio
     When I delete the portfolio "PortfolioToDelete"
     Then The response code is 204
     And The portfolio "PortfolioToDelete" does not exist
+
+  Scenario: Cannot delete another user's portfolio
+    Given There is a registered user with username "user1" and password "password" and email "user1@sample.app"
+    And There is a registered user with username "user2" and password "password" and email "user2@sample.app"
+    And I login as "user1" with password "password"
+    And I create a new portfolio with name "User1Portfolio"
+    And I logout
+    And I login as "user2" with password "password"
+    When I try to delete portfolio "User1Portfolio"
+    Then The response code is 403
