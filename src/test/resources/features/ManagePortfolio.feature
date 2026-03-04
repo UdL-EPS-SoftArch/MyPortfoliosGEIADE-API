@@ -35,3 +35,11 @@ Feature: Manage Portfolio
     When I update the portfolio name to "New Name"
     Then The response code is 200
     And The portfolio name is "New Name"
+
+  Scenario: Delete my portfolio
+    Given There is a registered user with username "user" and password "password" and email "user@sample.app"
+    And I login as "user" with password "password"
+    And I create a new portfolio with name "PortfolioToDelete"
+    When I delete the portfolio "PortfolioToDelete"
+    Then The response code is 204
+    And The portfolio "PortfolioToDelete" does not exist
