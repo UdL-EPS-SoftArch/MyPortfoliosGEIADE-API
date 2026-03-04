@@ -59,3 +59,8 @@ Feature: Manage Portfolio
     And I login as "user" with password "password"
     When I create a new portfolio with name ""
     Then The response code is 400
+
+  Scenario: Cannot create portfolio without login
+    Given I'm not logged in
+    When I create a new portfolio with name "My Portfolio"
+    Then The response code is 401
