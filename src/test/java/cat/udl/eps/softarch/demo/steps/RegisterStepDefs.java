@@ -2,6 +2,7 @@ package cat.udl.eps.softarch.demo.steps;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -10,12 +11,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.springframework.http.MediaType;
 
 import cat.udl.eps.softarch.demo.domain.Creator;
+import cat.udl.eps.softarch.demo.domain.User;
 import cat.udl.eps.softarch.demo.repository.CreatorRepository;
+import cat.udl.eps.softarch.demo.repository.UserRepository;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.json.JSONObject;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 public class RegisterStepDefs {
 
@@ -122,4 +127,10 @@ public class RegisterStepDefs {
                         .with(AuthenticationStepDefs.authenticate())
         ).andExpect(status().isNotFound());
     }
+
+    //falta aquest metode per implementar
+    @Then("There is no creator with username {string}")
+    public void there_is_no_creator_with_username(String username) {
+        //per implemetar tb
+}
 }

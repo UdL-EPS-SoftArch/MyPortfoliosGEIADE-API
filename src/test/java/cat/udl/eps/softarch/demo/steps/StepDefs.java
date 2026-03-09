@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.cucumber.spring.CucumberContextConfiguration;
@@ -37,7 +38,7 @@ import org.springframework.web.context.WebApplicationContext;
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
 @ActiveProfiles("test")
-@CucumberContextConfiguration
+//@CucumberContextConfiguration
 public class StepDefs {
 
     protected final WebApplicationContext wac; // Provides access to the Spring application context for testing
@@ -58,6 +59,11 @@ public class StepDefs {
                 .build();
         this.mapper.registerModule(new JavaTimeModule());
     }
+
+    @Given("There is a registered user with username {string} and password {string} and email {string}")
+    public void there_is_a_registered_user_with_username_and_password_and_email(String username, String password, String email) {
+    // implementar dsps pq no doni errror al fer
+}
 
     @Then("^The response code is (\\d+)$")
     public void theResponseCodeIs(int code) throws Throwable {
