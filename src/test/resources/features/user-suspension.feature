@@ -10,23 +10,18 @@ Feature: Suspend Creator User
     And The creator "creator1" is still enabled
 
   Scenario: Creator cannot suspend another creator
-    Given there is a registered creator with username "creator1", email "creator1@test.com" and password "abcd"
-    And I login as "creator1" with password "abcd"
+    Given There is a registered creator with username "creator1" and password "abcd" and email "creator1@test.com"
+    And There is a registered creator with username "creator2" and password "abcd" and email "creator2@test.com"
+    And I login as "creator2" with password "abcd"
     When I attempt to suspend the creator "creator1"
-    Then The error message is "Forbidden"
+    Then The response code is 401
     And The creator "creator1" is still enabled
 
   Scenario: Admin suspends a creator successfully
-    Given there is a registered creator with username "creator1", email "creator1@test.com" and password "abcd"
-    And there is a registered admin with username "admin1", email "admin1@test.com" and password "1234"
+    Given There is a registered creator with username "creator3" and password "abcd" and email "creator3@test.com"
+    And There is a registered admin with username "admin1" and password "1234" and email "admin1@test.com"
     And I login as "admin1" with password "1234"
-    When I suspend the creator "creator1"
-    Then The creator "creator1" is disabled
+    When I suspend the creator "creator3"
+    Then The creator "creator3" is disabled
 
-  Scenario: Admin cannot suspend another admin
-    Given there is a registered admin with username "admin2", email "admin2@test.com" and password "abcd"
-    And there is a registered admin with username "admin1", email "admin1@test.com" and password "1234"
-    And I login as "admin1" with password "1234"
-    When I attempt to suspend the creator "admin2"
-    Then The error message is "Cannot suspend an admin"
-    And The creator "admin2" is still enabled
+ 

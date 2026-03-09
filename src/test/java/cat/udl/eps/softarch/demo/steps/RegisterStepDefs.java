@@ -3,6 +3,7 @@ package cat.udl.eps.softarch.demo.steps;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -128,9 +129,19 @@ public class RegisterStepDefs {
         ).andExpect(status().isNotFound());
     }
 
-    //falta aquest metode per implementar
     @Then("There is no creator with username {string}")
     public void there_is_no_creator_with_username(String username) {
-        //per implemetar tb
-}
+        assertFalse(creatorRepository.existsById(username), "Creator \"" + username + "\" should not exist");
+    }
+
+    @And("^There is still only one creator with username \"([^\"]*)\"$")
+    public void thereIsStillOnlyOneCreatorWithUsername(String username) {
+        long count = 0;
+        for (Creator c : creatorRepository.findAll()) {
+            if (username.equals(c.getUsername())) {
+                count++;
+            }
+        }
+        assertEquals(1, count, "There should still be only one creator with username \"" + username + "\"");
+    }
 }
