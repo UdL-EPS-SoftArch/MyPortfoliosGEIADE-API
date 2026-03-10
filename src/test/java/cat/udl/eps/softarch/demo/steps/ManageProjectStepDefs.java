@@ -103,6 +103,25 @@ public class ManageProjectStepDefs {
             .andDo(print());
     }
 
+    // ➕ NOU
+    @When("I update the project named {string} setting visibility to {string}")
+    public void iUpdateTheProjectVisibility(String name, String visibility) throws Exception {
+        Project found = projectRepository.findByNameContaining(name)
+            .stream().filter(p -> p.getName().equals(name))
+            .findFirst().orElseThrow();
+
+        found.setVisibility(Visibility.valueOf(visibility));
+
+        stepDefs.result = stepDefs.mockMvc.perform(
+                put("/projects/{id}", found.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(stepDefs.mapper.writeValueAsString(found))
+                    .characterEncoding(StandardCharsets.UTF_8)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(AuthenticationStepDefs.authenticate()))
+            .andDo(print());
+    }
+
     @When("I delete the project named {string}")
     public void iDeleteTheProjectNamed(String name) throws Exception {
         Project found = projectRepository.findByNameContaining(name)
@@ -133,6 +152,12 @@ public class ManageProjectStepDefs {
     @Then("The project creation date should be set")
     public void theProjectCreationDateShouldBeSet() throws Exception {
         stepDefs.result.andExpect(jsonPath("$.created", notNullValue()));
+    }
+
+    // ➕ NOU
+    @Then("The project modification date should be set")
+    public void theProjectModificationDateShouldBeSet() throws Exception {
+        stepDefs.result.andExpect(jsonPath("$.modified", notNullValue()));
     }
 
     @Then("The project visibility should be {string}")
