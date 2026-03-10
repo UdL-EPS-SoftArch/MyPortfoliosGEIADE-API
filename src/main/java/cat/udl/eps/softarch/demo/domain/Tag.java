@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
@@ -21,6 +23,6 @@ public class Tag {
 
     private ZonedDateTime modified;
 
-    //@ManyToMany(mappedBy = "tags")
-    //private Set<Content> contentSet = new HashSet<>();
+    @ManyToMany(mappedBy = "tags")
+    private Set<Content> contentSet = new HashSet<>();
 }
