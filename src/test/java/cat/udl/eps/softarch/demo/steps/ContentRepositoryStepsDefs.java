@@ -57,6 +57,7 @@ public class ContentRepositoryStepsDefs {
 
     @Then("Content existsById should return true")
     public void exists_by_id_should_return_true() {
+        existsResult = contentRepository.existsById(createdContentId);
         Assertions.assertTrue(existsResult);
     }
 }

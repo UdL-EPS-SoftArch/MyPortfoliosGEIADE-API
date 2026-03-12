@@ -79,6 +79,7 @@ public class ReportRepositoryStepsDefs {
 
     @Then("Report existsById should return true")
     public void exists_by_id_should_return_true() {
+        existsResult = contentRepository.existsById(createdReportId);
         Assertions.assertTrue(existsResult);
     }
 }
