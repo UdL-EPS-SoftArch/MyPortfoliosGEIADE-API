@@ -3,6 +3,8 @@ package cat.udl.eps.softarch.demo.steps;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+
 
 import java.nio.charset.StandardCharsets;
 
@@ -67,7 +69,7 @@ public class ReportRepositoryStepsDefs {
                     .content(stepDefs.mapper.writeValueAsString(report))
                     .characterEncoding(StandardCharsets.UTF_8)
                     .accept(MediaType.APPLICATION_JSON)
-                    .with(AuthenticationStepDefs.authenticate()))
+                    .with(user("admin").roles("ADMIN")))
             .andDo(print())
             .andExpect(status().isCreated());
 

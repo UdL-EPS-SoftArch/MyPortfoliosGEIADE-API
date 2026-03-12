@@ -7,6 +7,7 @@ import io.cucumber.java.en.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 import org.springframework.http.MediaType;
 
@@ -44,7 +45,7 @@ public class ContentRepositoryStepsDefs {
                     .content(stepDefs.mapper.writeValueAsString(content))
                     .characterEncoding(StandardCharsets.UTF_8)
                     .accept(MediaType.APPLICATION_JSON)
-                    .with(AuthenticationStepDefs.authenticate()))
+                    .with(user("admin").roles("ADMIN")))
             .andDo(print())
             .andExpect(status().isCreated());
 
