@@ -2,6 +2,7 @@ package cat.udl.eps.softarch.demo.steps;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.nio.charset.StandardCharsets;
 
@@ -25,11 +26,14 @@ public class ReportRepositoryStepsDefs {
     private final StepDefs stepDefs;
     private final ContentRepository contentRepository;
 
-    @ParameterType(".*") public Content content(String name) {
-        return this.contentRepository.findByName(name).orElseThrow(() -> new RuntimeException("Content not found"));
+    @ParameterType(".*")
+    public Content content(String name) {
+        return this.contentRepository.findByName(name)
+                .orElseThrow(() -> new RuntimeException("Content not found"));
     }
 
-    @ParameterType("\\d+") public Long Long(String value) {
+    @ParameterType("\\d+")
+    public Long Long(String value) {
         return Long.valueOf(value);
     }
 
@@ -48,7 +52,6 @@ public class ReportRepositoryStepsDefs {
     @When("^I create a Report with reportId (\\d+), contentId (\\d+) and reason \"([^\"]*)\"$")
     public void iCreateAReport(Long reportId, Long contentId, String reason) throws Exception {
 
-        // Construimos el objeto Report a enviar
         Report report = new Report();
         report.setReportId(reportId);
 
@@ -58,7 +61,6 @@ public class ReportRepositoryStepsDefs {
 
         report.setReason(reason);
 
-        // Llamada a la API
         stepDefs.result = stepDefs.mockMvc.perform(
                 post("/reports")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -66,20 +68,16 @@ public class ReportRepositoryStepsDefs {
                     .characterEncoding(StandardCharsets.UTF_8)
                     .accept(MediaType.APPLICATION_JSON)
                     .with(AuthenticationStepDefs.authenticate()))
-            .andDo(print());
+            .andDo(print())
+            .andExpect(status().isCreated());
 
-        // Obtenemos la respuesta
-        String response = stepDefs.result.andReturn().getResponse().getContentAsString();
-        Report saved = stepDefs.mapper.readValue(response, Report.class);
-
-        // Guardamos el ID creado para validaciones posteriores
-        createdReportId = saved.getReportId();
-        existsResult = true; // o podrías hacer un GET para verificar existencia real
+        String location = stepDefs.result.andReturn().getResponse().getHeader("Location");
+        createdReportId = Long.valueOf(location.substring(location.lastIndexOf("/") + 1));
     }
 
     @Then("Report existsById should return true")
     public void exists_by_id_should_return_true() {
-        existsResult = contentRepository.existsById(createdReportId);
+        existsResult = reportRepository.existsById(createdReportId);
         Assertions.assertTrue(existsResult);
     }
 }

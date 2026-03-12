@@ -26,7 +26,6 @@ public class ContentRepositoryStepsDefs {
         this.stepDefs = stepDefs;
     }
 
-    
     @Given("there are no Contents in the system")
     public void there_are_no_Contents_in_the_system() {
         contentRepository.deleteAll();
@@ -46,14 +45,12 @@ public class ContentRepositoryStepsDefs {
                     .characterEncoding(StandardCharsets.UTF_8)
                     .accept(MediaType.APPLICATION_JSON)
                     .with(AuthenticationStepDefs.authenticate()))
-            .andDo(print());
+            .andDo(print())
+            .andExpect(status().isCreated());
 
-        // Guardamos el ID creado para validaciones posteriores
-        String response = stepDefs.result.andReturn().getResponse().getContentAsString();
-        Content saved = stepDefs.mapper.readValue(response, Content.class);
-        createdContentId = saved.getContentId();
+        String location = stepDefs.result.andReturn().getResponse().getHeader("Location");
+        createdContentId = Long.valueOf(location.substring(location.lastIndexOf("/") + 1));
     }
-
 
     @Then("Content existsById should return true")
     public void exists_by_id_should_return_true() {
