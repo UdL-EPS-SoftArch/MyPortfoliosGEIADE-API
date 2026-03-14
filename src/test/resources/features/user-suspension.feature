@@ -4,7 +4,8 @@ Feature: Suspend Creator User
   I want to suspend a CREATOR
 
   Scenario: Anonymous cannot suspend a creator
-    Given there is a registered creator with username "creator1", email "creator1@test.com" and password "abcd"
+    Given There is no registered creator with username "creator1"
+    When I register a new creator with username "creator1", email "creator1@test.com" and password "abcd"
     When I attempt to suspend the creator "creator1" as an anonymous user
     Then The error message is "Unauthorized"
     And The creator "creator1" is still enabled
@@ -14,7 +15,7 @@ Feature: Suspend Creator User
     And There is a registered creator with username "creator2" and password "abcd" and email "creator2@test.com"
     And I login as "creator2" with password "abcd"
     When I attempt to suspend the creator "creator1"
-    Then The response code is 401
+    Then The response code is 403
     And The creator "creator1" is still enabled
 
   Scenario: Admin suspends a creator successfully

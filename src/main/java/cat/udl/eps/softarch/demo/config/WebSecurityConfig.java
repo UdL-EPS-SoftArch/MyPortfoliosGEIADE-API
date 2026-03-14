@@ -40,7 +40,7 @@ public class WebSecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/admins").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/admins").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/admins/{username}").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/admins/{username}/suspend").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/admins/*/suspend").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/admins/*").denyAll()
 
                 //Creators
@@ -54,8 +54,8 @@ public class WebSecurityConfig {
                 //Profile
                 .requestMatchers(HttpMethod.GET, "/profiles").permitAll()
                 .requestMatchers(HttpMethod.POST, "/profiles").hasRole("CREATOR")
-                .requestMatchers(HttpMethod.GET, "/profiles/{username}").permitAll()
-                .requestMatchers(HttpMethod.PUT, "/profiles/{username}").hasRole("CREATOR")  
+                .requestMatchers(HttpMethod.GET, "/profiles/*").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/profiles/*").hasRole("CREATOR")  
                 .requestMatchers(HttpMethod.POST, "/profiles/*").hasRole("ADMIN")
 
 

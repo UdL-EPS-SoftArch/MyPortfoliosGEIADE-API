@@ -36,7 +36,7 @@ public class CustomCreatorController {
         creatorRepository.save(creator);
         return ResponseEntity.ok(creator);
     }
-    
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/creators/{username}/suspend")
     public ResponseEntity<Creator> suspendCreator (@PathVariable String username) {
 

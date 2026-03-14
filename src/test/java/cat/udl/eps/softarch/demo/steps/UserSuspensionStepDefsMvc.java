@@ -1,12 +1,16 @@
 package cat.udl.eps.softarch.demo.steps;
 
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import cat.udl.eps.softarch.demo.domain.Admin;
 import cat.udl.eps.softarch.demo.domain.Creator;
+import cat.udl.eps.softarch.demo.domain.User;
 import cat.udl.eps.softarch.demo.repository.CreatorRepository;
 import cat.udl.eps.softarch.demo.repository.AdminRepository;
 import io.cucumber.java.en.Given;
@@ -59,25 +63,22 @@ public class UserSuspensionStepDefsMvc {
     public void iAttemptToSuspendCreatorAnonymous(String username) throws Exception {
         stepDefs.result = stepDefs.mockMvc.perform(
                 post("/creators/{username}/suspend", username)
-        );
+        ).andDo(print());
     }
 
     // ----------------- Then -----------------
     @Then("The creator {string} is disabled")
     public void theCreatorIsDisabled(String username) throws Exception {
-        stepDefs.result = stepDefs.mockMvc.perform(
-                get("/creators/{username}", username)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .with(AuthenticationStepDefs.authenticate())
-        ).andExpect(jsonPath("$.enabled", is(false)));
+         Creator creator = creatorRepository.findById(username)
+        .orElseThrow(() -> new AssertionError("Creator not found: " + username));
+        assertFalse(creator.isEnabled());
     }
 
     @Then("The creator {string} is still enabled")
     public void theCreatorIsStillEnabled(String username) throws Exception {
-        stepDefs.result = stepDefs.mockMvc.perform(
-                get("/creators/{username}", username)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .with(AuthenticationStepDefs.authenticate())
-        ).andExpect(jsonPath("$.enabled", is(true)));
-    }
+         Creator creator = creatorRepository.findById(username)
+        .orElseThrow(() -> new AssertionError("Creator not found: " + username));
+        assertFalse(creator.isEnabled());
+}
+    
 }

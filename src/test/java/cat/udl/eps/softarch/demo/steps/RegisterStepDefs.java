@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.springframework.http.MediaType;
 
 import cat.udl.eps.softarch.demo.domain.Creator;
+import cat.udl.eps.softarch.demo.domain.Profile;
 import cat.udl.eps.softarch.demo.domain.User;
 import cat.udl.eps.softarch.demo.repository.CreatorRepository;
 import cat.udl.eps.softarch.demo.repository.UserRepository;
@@ -36,7 +37,10 @@ public class RegisterStepDefs {
     // ----------------- GIVEN -----------------
     @Given("^There is no registered creator with username \"([^\"]*)\"$")
     public void thereIsNoRegisteredCreatorWithUsername(String username) {
-        creatorRepository.deleteById(username); 
+        //salta error q lelimina direcatament
+        creatorRepository.findById(username)
+        .ifPresent(creator -> creatorRepository.delete(creator));
+
         assertFalse(creatorRepository.existsById(username), "Creator \"" + username + "\" shouldn't exist");
     }
 
@@ -48,6 +52,9 @@ public class RegisterStepDefs {
             creator.setEmail(email);
             creator.setPassword(password);
             creator.encodePassword();
+            creator.setEnabled(true);
+            Profile profile = new Profile();
+            creator.setProfile(profile);
             creatorRepository.save(creator);
         }
     }
