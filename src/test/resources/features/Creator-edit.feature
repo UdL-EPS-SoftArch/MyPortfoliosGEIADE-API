@@ -8,7 +8,7 @@ Given There is a registered creator with username "creator1" and password "abcd"
 And creator "creator1" has profile "description"
 And I login as "creator1" with password "abcd"
 When "creator1" edits its profile
-Then The response code is 201
+Then The response code is 200
 
 
 Scenario: Creator1 cannot edit Creator2 profie

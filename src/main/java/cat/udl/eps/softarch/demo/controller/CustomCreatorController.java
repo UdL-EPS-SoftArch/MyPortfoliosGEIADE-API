@@ -18,8 +18,8 @@ public class CustomCreatorController {
     }
 
     // PUT creators/username
-    @PutMapping("/creators/{username}")
-    @PreAuthorize("@creatorSecurity.isOwner(principal.username, #username)")
+    @PutMapping("/creators/{username}/profile")
+    @PreAuthorize("@CreatorSecurity.isOwner(principal.username, #username)")
     public ResponseEntity<Creator> updateCreator(@PathVariable String username,
                                                  @RequestBody Creator updated) {
 

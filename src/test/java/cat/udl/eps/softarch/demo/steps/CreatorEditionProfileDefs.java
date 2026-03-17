@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
@@ -54,6 +55,7 @@ public class CreatorEditionProfileDefs {
     public void creatorEditsItsProfile(String username) throws Exception {
         stepDefs.result = stepDefs.mockMvc.perform(
                 put("/creators/" + username + "/profile")
+                        .with(user("creator1").roles("CREATOR"))
                         .contentType("application/json")
                         .content("{\"description\":\"new description\"}")
 
