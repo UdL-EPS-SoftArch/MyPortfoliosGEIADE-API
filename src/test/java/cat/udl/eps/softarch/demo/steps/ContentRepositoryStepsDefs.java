@@ -66,8 +66,9 @@ public class ContentRepositoryStepsDefs {
                     .accept(MediaType.APPLICATION_JSON)
                     .with(AuthenticationStepDefs.authenticate()))
             .andDo(print());
-
-        createdContentId = content.getContentId();
+        
+        String location = stepDefs.result.andReturn().getResponse().getHeader("Location");
+        createdContentId = Long.valueOf(location.substring(location.lastIndexOf("/") + 1));
     }
 
     @Then("Content existsById should return true")

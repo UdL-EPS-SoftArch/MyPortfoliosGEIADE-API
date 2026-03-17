@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 import java.nio.charset.StandardCharsets;
+import java.time.ZonedDateTime;
 
 import org.junit.jupiter.api.Assertions;
 import org.springframework.http.MediaType;
@@ -54,7 +55,6 @@ public class ReportRepositoryStepsDefs {
         Assertions.assertEquals(0, reportRepository.count());
     }
 
-     
     @When("^I create a Report with the last created content and reason \"([^\"]*)\"$")
     public void iCreateAReportWithTheLastCreatedContent(String reason) throws Exception {
         Content content = contentRepository.findAll()
@@ -65,8 +65,9 @@ public class ReportRepositoryStepsDefs {
         Report report = new Report();
         report.setContent(content);
         report.setReason(reason);
+        report.setCreatedAt(ZonedDateTime.now());
 
-        String response = stepDefs.mockMvc.perform(
+        stepDefs.result = stepDefs.mockMvc.perform(
                 post("/reports")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(stepDefs.mapper.writeValueAsString(report))
@@ -74,13 +75,10 @@ public class ReportRepositoryStepsDefs {
                     .accept(MediaType.APPLICATION_JSON)
                     .with(AuthenticationStepDefs.authenticate()))
             .andDo(print())
-            .andExpect(status().isCreated())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
+            .andExpect(status().isCreated());
 
-        Report created = stepDefs.mapper.readValue(response, Report.class);
-        createdReportId = created.getReportId(); // o getId()
+        String location = stepDefs.result.andReturn().getResponse().getHeader("Location");
+        createdReportId = Long.valueOf(location.substring(location.lastIndexOf("/") + 1));
     }
 
     @Then("Report existsById should return true")
