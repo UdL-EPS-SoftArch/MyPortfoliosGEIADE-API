@@ -16,7 +16,7 @@ import cat.udl.eps.softarch.demo.domain.Report;
 
 import cat.udl.eps.softarch.demo.repository.ContentRepository;
 import cat.udl.eps.softarch.demo.repository.ReportRepository;
-
+import io.cucumber.core.internal.com.fasterxml.jackson.databind.node.ObjectNode;
 import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -62,21 +62,24 @@ public class ReportRepositoryStepsDefs {
             .reduce((first, second) -> second)
             .orElseThrow(() -> new RuntimeException("No contents found"));
 
-        Report report = new Report();
-        report.setContent(content);
-        report.setReason(reason);
-        report.setCreatedAt(ZonedDateTime.now());
+        String contentUri = "/contents/" + content.getContentId();
+
+        com.fasterxml.jackson.databind.node.ObjectNode json = stepDefs.mapper.createObjectNode();
+        json.put("reason", reason);
+        json.put("createdAt", ZonedDateTime.now().toString());
+        json.put("content", contentUri);
 
         stepDefs.result = stepDefs.mockMvc.perform(
-                post("/reports")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(stepDefs.mapper.writeValueAsString(report))
-                    .characterEncoding(StandardCharsets.UTF_8)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .with(AuthenticationStepDefs.authenticate()))
-            .andDo(print())
-            .andExpect(status().isCreated());
+            post("/reports")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.toString())
+                .characterEncoding(StandardCharsets.UTF_8)
+                .accept(MediaType.APPLICATION_JSON)
+                .with(AuthenticationStepDefs.authenticate()))
+        .andDo(print())
+        .andExpect(status().isCreated());
 
+        // Leer el ID real desde el header Location
         String location = stepDefs.result.andReturn().getResponse().getHeader("Location");
         createdReportId = Long.valueOf(location.substring(location.lastIndexOf("/") + 1));
     }
