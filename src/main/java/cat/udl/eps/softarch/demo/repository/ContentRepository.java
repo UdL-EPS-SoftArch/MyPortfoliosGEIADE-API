@@ -7,6 +7,8 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import java.util.Optional;
 
+import java.util.List;
+
 
 //import java.util.List;
 
@@ -16,7 +18,7 @@ public interface ContentRepository extends CrudRepository<cat.udl.eps.softarch.d
 
     boolean existsByName(String name);
 
-    
+    List<Content> findAll();
 
     //List<Content> findByProjectId(Long projectId);
 

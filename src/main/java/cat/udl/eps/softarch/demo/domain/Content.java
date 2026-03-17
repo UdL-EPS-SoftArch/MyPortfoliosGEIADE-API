@@ -40,10 +40,6 @@ public class Content {
     @JsonIdentityReference(alwaysAsId = true)
     @Column(nullable = false)
     private User user;*/
-
-    @OneToMany(mappedBy = "content")
-    @JsonIdentityReference(alwaysAsId = true)
-    private List<Report> reports;
     
     @Column(unique = true, nullable = false)
     private String name;

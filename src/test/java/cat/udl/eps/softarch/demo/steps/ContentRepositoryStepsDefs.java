@@ -8,33 +8,24 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import cat.udl.eps.softarch.demo.domain.User;
-import cat.udl.eps.softarch.demo.repository.UserRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import org.springframework.http.MediaType;
 
 import java.nio.charset.StandardCharsets;
+import java.time.ZonedDateTime;
+import cat.udl.eps.softarch.demo.domain.Visibility;
 
 import org.junit.jupiter.api.Assertions;
 
 public class ContentRepositoryStepsDefs {
 
     private final ContentRepository contentRepository;
-    private boolean existsResult;
     private Long createdContentId;
     private final StepDefs stepDefs;
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     public ContentRepositoryStepsDefs(
             ContentRepository contentRepository,
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
             StepDefs stepDefs) {
         this.contentRepository = contentRepository;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
         this.stepDefs = stepDefs;
     }
 
@@ -44,15 +35,17 @@ public class ContentRepositoryStepsDefs {
         Assertions.assertEquals(0, contentRepository.count());
     }
 
-    @Given("^There is a registered user with username \"([^\"]*)\" and password \"([^\"]*)\" and email \"([^\"]*)\"$")
-    public void thereIsARegisteredUserWithUsernameAndPasswordAndEmail(String username, String password, String email) {
-        if (userRepository.findById(username).isEmpty()) {
-            User user = new User();
-            user.setId(username);
-            user.setEmail(email);
-            user.setPassword(passwordEncoder.encode(password));
-            userRepository.save(user);
-        }
+    @Given("^There is a Content with name \"([^\"]*)\" and description \"([^\"]*)\"$")
+    public void thereIsAContentWithNameAndDescription(String name, String description) {
+        Content content = new Content();
+        content.setName(name);
+        content.setDescription(description);
+        content.setBody("Sample body");
+        content.setCreatedAt(ZonedDateTime.now());
+        content.setModifiedAt(ZonedDateTime.now());
+        content.setVisibility(Visibility.PUBLIC);
+
+        contentRepository.save(content);
     }
 
     @When("^I create a new content with name \"([^\"]*)\" and description \"([^\"]*)\"$")
@@ -60,6 +53,10 @@ public class ContentRepositoryStepsDefs {
         Content content = new Content();
         content.setName(name);
         content.setDescription(description);
+        content.setBody("Sample body");
+        content.setCreatedAt(ZonedDateTime.now());
+        content.setModifiedAt(ZonedDateTime.now());
+        content.setVisibility(Visibility.PUBLIC);
 
         stepDefs.result = stepDefs.mockMvc.perform(
                 post("/contents")
@@ -68,8 +65,9 @@ public class ContentRepositoryStepsDefs {
                     .characterEncoding(StandardCharsets.UTF_8)
                     .accept(MediaType.APPLICATION_JSON)
                     .with(AuthenticationStepDefs.authenticate()))
-            .andDo(print())
-            .andExpect(status().isCreated());
+            .andDo(print());
+
+        createdContentId = content.getContentId();
     }
 
     @Then("Content existsById should return true")

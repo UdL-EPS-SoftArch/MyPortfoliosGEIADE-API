@@ -4,18 +4,18 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+
 import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Assertions;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import cat.udl.eps.softarch.demo.domain.Content;
 import cat.udl.eps.softarch.demo.domain.Report;
-import cat.udl.eps.softarch.demo.domain.User;
+
 import cat.udl.eps.softarch.demo.repository.ContentRepository;
 import cat.udl.eps.softarch.demo.repository.ReportRepository;
-import cat.udl.eps.softarch.demo.repository.UserRepository;
+
 import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -25,8 +25,6 @@ public class ReportRepositoryStepsDefs {
 
     private final ReportRepository reportRepository;
     private final ContentRepository contentRepository;
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final StepDefs stepDefs;
     private Long createdReportId;
 
@@ -44,13 +42,9 @@ public class ReportRepositoryStepsDefs {
     public ReportRepositoryStepsDefs(
             ReportRepository reportRepository,
             ContentRepository contentRepository,
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
             StepDefs stepDefs) {
         this.reportRepository = reportRepository;
         this.contentRepository = contentRepository;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
         this.stepDefs = stepDefs;
     }
 
@@ -60,24 +54,15 @@ public class ReportRepositoryStepsDefs {
         Assertions.assertEquals(0, reportRepository.count());
     }
 
-    @Given("^There is a registered user with username \"([^\"]*)\" and password \"([^\"]*)\" and email \"([^\"]*)\"$")
-    public void thereIsARegisteredUserWithUsernameAndPasswordAndEmail(String username, String password, String email) {
-        if (userRepository.findById(username).isEmpty()) {
-            User user = new User();
-            user.setId(username);
-            user.setEmail(email);
-            user.setPassword(passwordEncoder.encode(password));
-            userRepository.save(user);
-        }
-    }
-
-    @When("^I create a Report with contentId (\\d+) and reason \"([^\"]*)\"$")
-    public void iCreateAReport(Long contentId, String reason) throws Exception {
+     
+    @When("^I create a Report with the last created content and reason \"([^\"]*)\"$")
+    public void iCreateAReportWithTheLastCreatedContent(String reason) throws Exception {
+        Content content = contentRepository.findAll()
+            .stream()
+            .reduce((first, second) -> second)
+            .orElseThrow(() -> new RuntimeException("No contents found"));
 
         Report report = new Report();
-        Content content = contentRepository.findById(contentId)
-            .orElseThrow(() -> new RuntimeException("Content not found with id " + contentId));
-
         report.setContent(content);
         report.setReason(reason);
 
@@ -95,7 +80,7 @@ public class ReportRepositoryStepsDefs {
             .getContentAsString();
 
         Report created = stepDefs.mapper.readValue(response, Report.class);
-        createdReportId = created.getReportId();
+        createdReportId = created.getReportId(); // o getId()
     }
 
     @Then("Report existsById should return true")
