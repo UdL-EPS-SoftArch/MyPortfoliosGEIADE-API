@@ -65,8 +65,7 @@ public class AdminStepDefs {
                         .content(new JSONObject(stepDefs.mapper.writeValueAsString(admin)).put("password", password).toString())
                         .characterEncoding(StandardCharsets.UTF_8)
                         .accept(MediaType.APPLICATION_JSON)
-                        .with(AuthenticationStepDefs.authenticate()))
-                .andDo(print());
+                        .with(AuthenticationStepDefs.authenticate()));
     }
 }
 

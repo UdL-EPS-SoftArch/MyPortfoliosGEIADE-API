@@ -78,7 +78,7 @@ public class UserSuspensionStepDefsMvc {
     public void theCreatorIsStillEnabled(String username) throws Exception {
          Creator creator = creatorRepository.findById(username)
         .orElseThrow(() -> new AssertionError("Creator not found: " + username));
-        assertFalse(creator.isEnabled());
+        assertTrue(creator.isEnabled());
 }
     
 }

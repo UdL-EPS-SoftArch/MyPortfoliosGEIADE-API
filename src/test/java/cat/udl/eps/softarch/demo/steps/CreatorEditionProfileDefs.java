@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 public class CreatorEditionProfileDefs {
 
@@ -51,14 +52,12 @@ public class CreatorEditionProfileDefs {
 
     @When("{string} edits its profile")
     public void creatorEditsItsProfile(String username) throws Exception {
-
-        AuthenticationStepDefs.currentUsername = username;
-        AuthenticationStepDefs.currentPassword = "abcd";
-
         stepDefs.result = stepDefs.mockMvc.perform(
                 put("/creators/" + username + "/profile")
-                        .with(AuthenticationStepDefs.authenticate())
-        );
+                        .contentType("application/json")
+                        .content("{\"description\":\"new description\"}")
+
+        ).andDo(print());
     }
 
     // ----------------------------------------------------
@@ -67,10 +66,6 @@ public class CreatorEditionProfileDefs {
 
     @When("creator {string} edits {string} profile")
     public void creatorEditsOtherProfile(String editor, String owner) throws Exception {
-
-        AuthenticationStepDefs.currentUsername = editor;
-        AuthenticationStepDefs.currentPassword = "abcd";
-
         stepDefs.result = stepDefs.mockMvc.perform(
                 put("/creators/" + owner + "/profile")
                         .with(AuthenticationStepDefs.authenticate())

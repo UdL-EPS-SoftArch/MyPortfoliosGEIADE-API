@@ -5,7 +5,7 @@ Feature: Suspend Creator User
 
   Scenario: Anonymous cannot suspend a creator
     Given There is no registered creator with username "creator1"
-    When I register a new creator with username "creator1", email "creator1@test.com" and password "abcd"
+    Given There is a registered creator with username "creator1" and password "abcd" and email "creator1@test.com" 
     When I attempt to suspend the creator "creator1" as an anonymous user
     Then The error message is "Unauthorized"
     And The creator "creator1" is still enabled
