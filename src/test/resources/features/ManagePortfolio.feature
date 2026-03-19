@@ -98,3 +98,9 @@ Feature: Manage Portfolio
     And I login as "user2" with password "password"
     When I request portfolios of "user1"
     Then The response code is 200
+
+  Scenario: Portfolio is private by default
+    Given There is a registered user with username "user" and password "password" and email "user@sample.app"
+    And I login as "user" with password "password"
+    When I create a new portfolio with name "My Portfolio"
+    Then The portfolio visibility is "PRIVATE"
