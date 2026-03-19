@@ -4,16 +4,9 @@ import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 //import jakarta.persistence.JoinColumn;
 //import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import lombok.Data;
 //import lombok.EqualsAndHashCode;
 /*
@@ -36,10 +29,13 @@ public class Content {
     @Column(nullable = false)
     private Project project;*/
 
-    /*@ManyToOne
+    @ManyToMany
+    private List<Tag> tags;
+
+    @ManyToOne
+    @JoinColumn(nullable = false)
     @JsonIdentityReference(alwaysAsId = true)
-    @Column(nullable = false)
-    private User user;*/
+    private User user;
 
     @OneToMany(mappedBy = "content")
     @JsonIdentityReference(alwaysAsId = true)
@@ -63,5 +59,4 @@ public class Content {
 
     @Enumerated(EnumType.STRING) 
     @Column(nullable = false) private Visibility visibility;
-    
 }

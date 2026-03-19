@@ -1,5 +1,6 @@
 package cat.udl.eps.softarch.demo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -22,7 +23,4 @@ public class Tag {
     private ZonedDateTime created;
 
     private ZonedDateTime modified;
-
-    //@ManyToMany(mappedBy = "tags")
-    //private Set<Content> contentSet = new HashSet<>();
 }
