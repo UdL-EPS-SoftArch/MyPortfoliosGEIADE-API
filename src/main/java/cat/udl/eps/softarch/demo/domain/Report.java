@@ -34,7 +34,7 @@ public class Report {
 
     @ManyToOne
     @JoinColumn(name = "content_id", nullable = false)
-    private Content content;
+    private Content content; 
 
     @org.hibernate.validator.constraints.Length(max = 100)
     @Column(length = 100)
