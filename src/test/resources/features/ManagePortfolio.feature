@@ -88,3 +88,13 @@ Feature: Manage Portfolio
     When I request public portfolios
     Then The response code is 200
     And The list contains a portfolio named "Public Portfolio"
+
+  Scenario: User can access another user's public portfolio
+    Given There is a registered user with username "user1" and password "password" and email "user1@sample.app"
+    And There is a registered user with username "user2" and password "password" and email "user2@sample.app"
+    And I login as "user1" with password "password"
+    And I create a new portfolio with name "Public Portfolio" and visibility "PUBLIC"
+    And I logout
+    And I login as "user2" with password "password"
+    When I request portfolios of "user1"
+    Then The response code is 200
