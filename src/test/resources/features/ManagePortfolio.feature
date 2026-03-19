@@ -11,12 +11,12 @@ Feature: Manage Portfolio
     And The new portfolio is owned by "user"
 
   Scenario: Get my portfolios
-      Given There is a registered user with username "user" and password "password" and email "user@sample.app"
-      And I login as "user" with password "password"
-      And I create a new portfolio with name "Portfolio1"
-      When I request my portfolios
-      Then The response code is 200
-      And The list contains a portfolio named "Portfolio1"
+    Given There is a registered user with username "user" and password "password" and email "user@sample.app"
+    And I login as "user" with password "password"
+    And I create a new portfolio with name "Portfolio1"
+    When I request my portfolios
+    Then The response code is 200
+    And The list contains a portfolio named "Portfolio1"
 
   Scenario: Cannot access another user's portfolio
     Given There is a registered user with username "user1" and password "password" and email "user1@sample.app"
@@ -74,3 +74,9 @@ Feature: Manage Portfolio
     And I login as "user2" with password "password"
     When I try to update the portfolio name to "HackedPortfolio"
     Then The response code is 403
+
+  Scenario: Cannot list portfolios without login
+    Given I'm not logged in
+    When I request my portfolios
+    Then The response code is 401
+
