@@ -80,3 +80,11 @@ Feature: Manage Portfolio
     When I request my portfolios
     Then The response code is 401
 
+  Scenario: Anonymous can access public portfolios
+    Given There is a registered user with username "user1" and password "password" and email "user1@sample.app"
+    And I login as "user1" with password "password"
+    And I create a new portfolio with name "Public Portfolio" and visibility "PUBLIC"
+    And I logout
+    When I request public portfolios
+    Then The response code is 200
+    And The list contains a portfolio named "Public Portfolio"
