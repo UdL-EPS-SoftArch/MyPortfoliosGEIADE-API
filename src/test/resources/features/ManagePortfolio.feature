@@ -96,7 +96,7 @@ Feature: Manage Portfolio
     And I create a new portfolio with name "Public Portfolio" and visibility "PUBLIC"
     And I logout
     And I login as "user2" with password "password"
-    When I request portfolios of "user1"
+    When I request public portfolios of "user1"
     Then The response code is 200
 
   Scenario: Portfolio is private by default
