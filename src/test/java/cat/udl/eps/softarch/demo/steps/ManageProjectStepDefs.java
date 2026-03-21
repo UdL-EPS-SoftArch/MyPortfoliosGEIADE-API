@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 
 import java.nio.charset.StandardCharsets;
 
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -121,6 +122,15 @@ public class ManageProjectStepDefs {
                     .with(AuthenticationStepDefs.authenticate()))
             .andDo(print());
     }
+    
+    @When("I retrieve the list of projects")
+    public void iRetrieveTheListOfProjects() throws Exception {
+        stepDefs.result = stepDefs.mockMvc.perform(
+                get("/projects")
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(AuthenticationStepDefs.authenticate()))
+            .andDo(print());
+}
 
     @When("I delete the project named {string}")
     public void iDeleteTheProjectNamed(String name) throws Exception {
@@ -159,6 +169,13 @@ public class ManageProjectStepDefs {
     public void theProjectModificationDateShouldBeSet() throws Exception {
         stepDefs.result.andExpect(jsonPath("$.modified", notNullValue()));
     }
+
+    @Then("The project list contains a project named {string}")
+    public void theProjectListContainsAProjectNamed(String name) throws Exception {
+        stepDefs.result.andExpect(
+            jsonPath("$._embedded.projects[*].name", hasItem(is(name)))
+    );
+}
 
     @Then("The project visibility should be {string}")
     public void theProjectVisibilityShouldBe(String visibility) throws Exception {
