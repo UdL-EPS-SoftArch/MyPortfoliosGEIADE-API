@@ -13,4 +13,5 @@ import java.util.List;
 public interface ProjectRepository extends CrudRepository<Project, Long>, PagingAndSortingRepository<Project, Long> {
 
     List<Project> findByNameContaining(@Param("name") String name);
+    
 }

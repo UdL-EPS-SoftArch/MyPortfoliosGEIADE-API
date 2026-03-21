@@ -31,6 +31,7 @@ public class Project extends UriEntity<Long> {
 
     // Relació amb Portfolio (segons el diagrama, un Project pertany a un Portfolio)
     //@ManyToOne
+    //@JoinColumn(name = "portfolio_id")
     //private Portfolio portfolio;
 
     public Project() {
@@ -56,5 +57,9 @@ public class Project extends UriEntity<Long> {
     public void setName(String name) {this.name = name;}
 
     public void setDescription(String description) {this.description = description;}
+
+    //public void setPortfolio(Portfolio portfolio) {
+        //this.portfolio = portfolio;
+    //}
 
 }

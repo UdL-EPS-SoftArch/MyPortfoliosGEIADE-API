@@ -35,6 +35,8 @@ Feature: Manage Project
     When I send the create project request
     Then The response code is 400
 
+
+  
   # ---- READ ----
 
   Scenario: Retrieve an existing project
@@ -61,6 +63,14 @@ Feature: Manage Project
     And The project list contains a project named "Project A"
     And The project list contains a project named "Project B"
 
+  Scenario: Retrieve an empty list of projects
+    Given There is a registered user with username "user" and password "password" and email "user@sample.app"
+    And I login as "user" with password "password"
+    When I retrieve the list of projects
+    Then The response code is 200
+  
+ 
+
   # ---- UPDATE ----
 
   Scenario: Update a project name
@@ -86,6 +96,13 @@ Feature: Manage Project
     And I'm not logged in
     When I update the project named "Some Project" with new name "Hacked"
     Then The response code is 401
+  
+
+  Scenario: Update visibility of a non-existing project
+  Given There is a registered user with username "user" and password "password" and email "user@sample.app"
+  And I login as "user" with password "password"
+  When I update the project with id 9999 setting visibility to "PRIVATE"
+  Then The response code is 404
 
   # ---- DELETE ----
 

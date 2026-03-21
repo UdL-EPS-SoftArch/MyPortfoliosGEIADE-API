@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -49,6 +50,7 @@ public class ManageProjectStepDefs {
         p.setVisibility(Visibility.valueOf(visibility));
         projectRepository.save(p);
     }
+
 
     // ===================== WHEN =====================
 
@@ -86,6 +88,36 @@ public class ManageProjectStepDefs {
             .andDo(print());
     }
 
+    @When("I update the project with id {long} setting name to {string}")
+    public void iUpdateTheProjectWithIdSettingName(Long id, String newName) throws Exception {
+        Project project = new Project();
+        project.setName(newName);
+
+        stepDefs.result = stepDefs.mockMvc.perform(
+                patch("/projects/{id}", id)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(stepDefs.mapper.writeValueAsString(project))
+                    .characterEncoding(StandardCharsets.UTF_8)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(AuthenticationStepDefs.authenticate()))
+            .andDo(print());
+    }
+
+    @When("I update the project with id {long} setting visibility to {string}")
+    public void iUpdateTheProjectWithIdSettingVisibility(Long id, String visibility) throws Exception {
+        Project project = new Project();
+        project.setVisibility(Visibility.valueOf(visibility));
+
+        stepDefs.result = stepDefs.mockMvc.perform(
+                patch("/projects/{id}", id)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(stepDefs.mapper.writeValueAsString(project))
+                    .characterEncoding(StandardCharsets.UTF_8)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(AuthenticationStepDefs.authenticate()))
+            .andDo(print());
+    }
+
     @When("I update the project named {string} with new name {string}")
     public void iUpdateTheProjectNamed(String oldName, String newName) throws Exception {
         Project found = projectRepository.findByNameContaining(oldName)
@@ -104,7 +136,7 @@ public class ManageProjectStepDefs {
             .andDo(print());
     }
 
-    // ➕ NOU
+    
     @When("I update the project named {string} setting visibility to {string}")
     public void iUpdateTheProjectVisibility(String name, String visibility) throws Exception {
         Project found = projectRepository.findByNameContaining(name)
@@ -122,6 +154,7 @@ public class ManageProjectStepDefs {
                     .with(AuthenticationStepDefs.authenticate()))
             .andDo(print());
     }
+
     
     @When("I retrieve the list of projects")
     public void iRetrieveTheListOfProjects() throws Exception {
@@ -164,7 +197,7 @@ public class ManageProjectStepDefs {
         stepDefs.result.andExpect(jsonPath("$.created", notNullValue()));
     }
 
-    // ➕ NOU
+    
     @Then("The project modification date should be set")
     public void theProjectModificationDateShouldBeSet() throws Exception {
         stepDefs.result.andExpect(jsonPath("$.modified", notNullValue()));
@@ -174,11 +207,18 @@ public class ManageProjectStepDefs {
     public void theProjectListContainsAProjectNamed(String name) throws Exception {
         stepDefs.result.andExpect(
             jsonPath("$._embedded.projects[*].name", hasItem(is(name)))
-    );
-}
+        );
+    }
 
     @Then("The project visibility should be {string}")
     public void theProjectVisibilityShouldBe(String visibility) throws Exception {
         stepDefs.result.andExpect(jsonPath("$.visibility", is(visibility)));
     }
+
+    @Then("The project list is empty")
+    public void theProjectListIsEmpty() throws Exception {
+        stepDefs.result.andExpect(jsonPath("$._embedded.projects", empty()));
+    }
+
+
 }

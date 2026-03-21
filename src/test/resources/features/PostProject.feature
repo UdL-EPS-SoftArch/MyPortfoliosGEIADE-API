@@ -59,6 +59,12 @@ Feature: Manage Project
     And I'm not logged in
     When I update the project named "Some Project" with new name "Hacked"
     Then The response code is 401
+  
+  Scenario: Update a non-existing project
+    Given There is a registered user with username "user" and password "password" and email "user@sample.app"
+    And I login as "user" with password "password"
+    When I update the project with id 9999 setting name to "New Name"
+    Then The response code is 404
 
   # ---- DELETE ----
 
