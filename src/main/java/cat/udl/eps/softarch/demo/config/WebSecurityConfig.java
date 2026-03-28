@@ -38,6 +38,8 @@ public class WebSecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/*/*").authenticated()
                 .requestMatchers(HttpMethod.PATCH, "/*/*").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/*/*").authenticated()
+                .requestMatchers(HttpMethod.GET, "/portfolios/search/findByVisibility").permitAll()
+                .requestMatchers(HttpMethod.GET, "/portfolios/**").authenticated()
                 .anyRequest().permitAll())
             .csrf((csrf) -> csrf.disable())
             .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

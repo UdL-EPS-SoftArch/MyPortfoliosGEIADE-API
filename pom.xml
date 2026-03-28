@@ -13,7 +13,7 @@
 	<groupId>cat.udl.eps.softarch</groupId>
 	<artifactId>MyPortfoliosGEIADE-API</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>MyPortfoliosGEIADE-API</name>
+	<name>sMyPortfoliosGEIADE-API</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
@@ -89,14 +89,12 @@
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>1.18.34</version>
-			<scope>provided</scope>
-		</dependency>
-
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.34</version>
+            <scope>provided</scope>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
