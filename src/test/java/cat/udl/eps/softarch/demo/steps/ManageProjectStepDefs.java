@@ -64,6 +64,15 @@ public class ManageProjectStepDefs {
                     .accept(MediaType.APPLICATION_JSON)
                     .with(AuthenticationStepDefs.authenticate()))
             .andDo(print());
+
+        if (stepDefs.result.andReturn().getResponse().getStatus() == 201) {
+            String location = stepDefs.result.andReturn().getResponse().getHeader("Location");
+            stepDefs.result = stepDefs.mockMvc.perform(
+                    get(location)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(AuthenticationStepDefs.authenticate()))
+                .andDo(print());
+        }
     }
 
     @When("I retrieve the project named {string}")

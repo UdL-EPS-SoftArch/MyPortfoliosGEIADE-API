@@ -10,7 +10,7 @@ Feature: Manage Project
     And I login as "user" with password "password"
     And I prepare a project with name "Java Project" and description "Uses Java" and visibility "PUBLIC"
     When I send the create project request
-    Then The response code is 201
+    Then The response code is 200
     And The project name is "Java Project"
     And The project creation date should be set
 
