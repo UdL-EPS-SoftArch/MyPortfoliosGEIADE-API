@@ -10,4 +10,5 @@ Feature: Manage Record
         Then The response code is 201
         And The new record is owned by "user"
         And The list of records owned by "user" includes one named "My Record"
-        # TODO: other scenarios, like not possible to access a record by another user...
+
+# TODO: other scenarios, like not possible to access a record by another user...
