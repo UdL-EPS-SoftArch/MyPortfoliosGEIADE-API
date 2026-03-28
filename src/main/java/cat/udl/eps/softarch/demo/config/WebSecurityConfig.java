@@ -26,18 +26,21 @@ public class WebSecurityConfig {
 
     @Bean
     protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers(HttpMethod.GET, "/identity").authenticated()
-                .requestMatchers(HttpMethod.GET, "/users").authenticated()
-                .requestMatchers(HttpMethod.POST, "/users").anonymous()
-                .requestMatchers(HttpMethod.POST, "/users/*").denyAll()
-                .requestMatchers(HttpMethod.POST, "/*/*").authenticated()
-                .requestMatchers(HttpMethod.PUT, "/*/*").authenticated()
-                .requestMatchers(HttpMethod.PATCH, "/*/*").authenticated()
-                .requestMatchers(HttpMethod.DELETE, "/*/*").authenticated()
-                .requestMatchers(HttpMethod.GET, "/portfolios/search/findByVisibility").permitAll()
-                .requestMatchers(HttpMethod.GET, "/portfolios/**").authenticated()
-                .anyRequest().permitAll())
+       http.authorizeHttpRequests((auth) -> auth
+        .requestMatchers(HttpMethod.GET, "/identity").authenticated()
+        .requestMatchers(HttpMethod.GET, "/users").authenticated()
+        .requestMatchers(HttpMethod.POST, "/users").anonymous()
+        .requestMatchers(HttpMethod.POST, "/users/*").denyAll()
+        .requestMatchers(HttpMethod.POST, "/projects").authenticated()
+        .requestMatchers(HttpMethod.PUT, "/projects/*").authenticated()
+        .requestMatchers(HttpMethod.DELETE, "/projects/*").authenticated()
+        .requestMatchers(HttpMethod.POST, "/*/*").authenticated()
+        .requestMatchers(HttpMethod.PUT, "/*/*").authenticated()
+        .requestMatchers(HttpMethod.PATCH, "/*/*").authenticated()
+        .requestMatchers(HttpMethod.DELETE, "/*/*").authenticated()
+        .requestMatchers(HttpMethod.GET, "/portfolios/search/findByVisibility").permitAll()
+        .requestMatchers(HttpMethod.GET, "/portfolios/**").authenticated()
+        .anyRequest().permitAll())
             .csrf((csrf) -> csrf.disable())
             .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .cors((cors) -> cors.configurationSource(corsConfigurationSource()))
