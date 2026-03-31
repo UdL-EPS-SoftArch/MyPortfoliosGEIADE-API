@@ -24,9 +24,9 @@ public class CustomProfileController {
         this.profileRepository = profileRepository;
     }
     
-    // PUT /profiles/id --> sobreescriu 
+    // PUT /profiles/id 
     @PutMapping("/products/{id}")
-    @PreAuthorize("@profileSecurity.isOwner(principal.username, #id)")  // per podrela cridar ha de tenir rol CREATOR
+    @PreAuthorize("@profileSecurity.isOwner(principal.username, #id)")  
     @ResponseBody
     public ResponseEntity<Profile> updateProfile(@PathVariable Long id,
                                                  @RequestBody Profile updatedProfile) {
@@ -45,7 +45,6 @@ public class CustomProfileController {
         return ResponseEntity.ok(profile);
     }
 
-    //Només puc fer GET a un perfil si sóc el propietari o el perfil és públic.
     @GetMapping("/products/{id}")
     @PreAuthorize("@profileSecurity.isOwner(principal.username, #id) or @profileSecurity.isPublic(#id)")
     @ResponseBody
