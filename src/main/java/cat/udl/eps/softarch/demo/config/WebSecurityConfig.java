@@ -26,45 +26,39 @@ public class WebSecurityConfig {
 
     @Bean
     protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers(HttpMethod.GET, "/identity").authenticated()
+       http.authorizeHttpRequests((auth) -> auth
+        .requestMatchers(HttpMethod.GET, "/identity").authenticated()
+           // Users
+           /*
+           .requestMatchers(HttpMethod.GET, "/users").authenticated()
+           .requestMatchers(HttpMethod.POST, "/users").anonymous()
+           .requestMatchers(HttpMethod.GET, "/users/{username}").anonymous()
+           .requestMatchers(HttpMethod.POST, "/users/*").denyAll() */
 
-                // Users
-                /*
-                .requestMatchers(HttpMethod.GET, "/users").authenticated()
-                .requestMatchers(HttpMethod.POST, "/users").anonymous()
-                .requestMatchers(HttpMethod.GET, "/users/{username}").anonymous() 
-                .requestMatchers(HttpMethod.POST, "/users/*").denyAll() */
+           //Admins
+           .requestMatchers(HttpMethod.GET, "/admins").hasRole("ADMIN")
+           .requestMatchers(HttpMethod.POST, "/admins").hasRole("ADMIN")
+           .requestMatchers(HttpMethod.GET, "/admins/{username}").hasRole("ADMIN")
+           .requestMatchers(HttpMethod.POST, "/admins/*/suspend").hasRole("ADMIN")
+           .requestMatchers(HttpMethod.POST, "/admins/*").denyAll()
 
-                //Admins
-                .requestMatchers(HttpMethod.GET, "/admins").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/admins").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET, "/admins/{username}").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/admins/*/suspend").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/admins/*").denyAll()
+           //Creators
+           .requestMatchers(HttpMethod.GET, "/creators").permitAll()
+           .requestMatchers(HttpMethod.POST, "/creators").permitAll()
+           .requestMatchers(HttpMethod.GET, "/creators/{username}").permitAll()
+           .requestMatchers(HttpMethod.PUT, "/creators/{username}").hasRole("ADMIN")
+           .requestMatchers(HttpMethod.POST, "/creators/*").hasRole("ADMIN")
 
-                //Creators
-                .requestMatchers(HttpMethod.GET, "/creators").permitAll()
-                .requestMatchers(HttpMethod.POST, "/creators").permitAll()
-                .requestMatchers(HttpMethod.GET, "/creators/{username}").permitAll()
-                .requestMatchers(HttpMethod.PUT, "/creators/{username}").hasRole("ADMIN")  
-                .requestMatchers(HttpMethod.POST, "/creators/*").hasRole("ADMIN")
-                //.requestMatchers(HttpMethod.POST, "/creators/{username}/suspend").hasRole("ADMIN")
-
-                //Profile
-                .requestMatchers(HttpMethod.GET, "/profiles").permitAll()
-                .requestMatchers(HttpMethod.POST, "/profiles").hasRole("CREATOR")
-                .requestMatchers(HttpMethod.GET, "/profiles/*").permitAll()
-                .requestMatchers(HttpMethod.PUT, "/profiles/*").hasRole("CREATOR")  
-                .requestMatchers(HttpMethod.POST, "/profiles/*").hasRole("ADMIN")
-
-
-
-                .requestMatchers(HttpMethod.POST, "/*/*").authenticated()
-                .requestMatchers(HttpMethod.PUT, "/*/*").authenticated()
-                .requestMatchers(HttpMethod.PATCH, "/*/*").authenticated()
-                .requestMatchers(HttpMethod.DELETE, "/*/*").authenticated()
-                .anyRequest().permitAll())
+        .requestMatchers(HttpMethod.POST, "/projects").authenticated()
+        .requestMatchers(HttpMethod.PUT, "/projects/*").authenticated()
+        .requestMatchers(HttpMethod.DELETE, "/projects/*").authenticated()
+        .requestMatchers(HttpMethod.POST, "/*/*").authenticated()
+        .requestMatchers(HttpMethod.PUT, "/*/*").authenticated()
+        .requestMatchers(HttpMethod.PATCH, "/*/*").authenticated()
+        .requestMatchers(HttpMethod.DELETE, "/*/*").authenticated()
+        .requestMatchers(HttpMethod.GET, "/portfolios/search/findByVisibility").permitAll()
+        .requestMatchers(HttpMethod.GET, "/portfolios/**").authenticated()
+        .anyRequest().permitAll())
             .csrf((csrf) -> csrf.disable())
             .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .cors((cors) -> cors.configurationSource(corsConfigurationSource()))
