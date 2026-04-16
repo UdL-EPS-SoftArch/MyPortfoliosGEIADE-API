@@ -1,8 +1,12 @@
 package cat.udl.eps.softarch.demo.steps;
 
 import cat.udl.eps.softarch.demo.domain.Project;
+import cat.udl.eps.softarch.demo.domain.Portfolio;
+import cat.udl.eps.softarch.demo.domain.User;
 import cat.udl.eps.softarch.demo.domain.Visibility;
+import cat.udl.eps.softarch.demo.repository.PortfolioRepository;
 import cat.udl.eps.softarch.demo.repository.ProjectRepository;
+import cat.udl.eps.softarch.demo.repository.UserRepository;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -24,11 +28,18 @@ public class ManageProjectStepDefs {
 
     private final StepDefs stepDefs;
     private final ProjectRepository projectRepository;
+    private final PortfolioRepository portfolioRepository;
+    private final UserRepository userRepository;
     private Project preparedProject;
 
-    public ManageProjectStepDefs(StepDefs stepDefs, ProjectRepository projectRepository) {
+    public ManageProjectStepDefs(StepDefs stepDefs,
+                                 ProjectRepository projectRepository,
+                                 PortfolioRepository portfolioRepository,
+                                 UserRepository userRepository) {
         this.stepDefs = stepDefs;
         this.projectRepository = projectRepository;
+        this.portfolioRepository = portfolioRepository;
+        this.userRepository = userRepository;
         this.stepDefs.mapper.registerModule(new JavaTimeModule());
     }
 
@@ -40,6 +51,7 @@ public class ManageProjectStepDefs {
         preparedProject.setName(name);
         preparedProject.setDescription(description);
         preparedProject.setVisibility(Visibility.valueOf(visibility));
+        preparedProject.setPortfolio(createPortfolioForCurrentContext("prepared-" + normalizeName(name)));
     }
 
     @And("There is a project with name {string} and description {string} and visibility {string}")
@@ -48,6 +60,7 @@ public class ManageProjectStepDefs {
         p.setName(name);
         p.setDescription(description);
         p.setVisibility(Visibility.valueOf(visibility));
+        p.setPortfolio(createPortfolioForCurrentContext("stored-" + normalizeName(name)));
         projectRepository.save(p);
     }
 
@@ -229,5 +242,34 @@ public class ManageProjectStepDefs {
         stepDefs.result.andExpect(jsonPath("$._embedded.projects", empty()));
     }
 
+    private Portfolio createPortfolioForCurrentContext(String baseName) {
+        String username = AuthenticationStepDefs.currentUsername;
+        if (username == null || username.isBlank()) {
+            username = "project-owner";
+        }
+        final String ownerUsername = username;
+
+        User owner = userRepository.findById(ownerUsername).orElseGet(() -> {
+            User user = new User();
+            user.setId(ownerUsername);
+            user.setEmail(ownerUsername + "@sample.app");
+            user.setPassword("password");
+            user.encodePassword();
+            return userRepository.save(user);
+        });
+
+        Portfolio portfolio = new Portfolio();
+        portfolio.setName(baseName + "-portfolio");
+        portfolio.setVisibility(Visibility.PUBLIC);
+        portfolio.setOwner(owner);
+        return portfolioRepository.save(portfolio);
+    }
+
+    private String normalizeName(String value) {
+        if (value == null || value.isBlank()) {
+            return "project";
+        }
+        return value.toLowerCase().replaceAll("[^a-z0-9]+", "-");
+    }
 
 }
