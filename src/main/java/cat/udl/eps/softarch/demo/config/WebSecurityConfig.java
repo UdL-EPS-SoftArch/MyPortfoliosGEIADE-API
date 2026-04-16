@@ -34,19 +34,19 @@ public class WebSecurityConfig {
                .requestMatchers(HttpMethod.POST, "/users").anonymous()
                .requestMatchers(HttpMethod.GET, "/users/{username}").anonymous()
                .requestMatchers(HttpMethod.POST, "/users/*").denyAll()
-               //Admins
+               // Admins
                .requestMatchers(HttpMethod.GET, "/admins").hasRole("ADMIN")
                .requestMatchers(HttpMethod.POST, "/admins").hasRole("ADMIN")
                .requestMatchers(HttpMethod.GET, "/admins/{username}").hasRole("ADMIN")
                .requestMatchers(HttpMethod.POST, "/admins/*/suspend").hasRole("ADMIN")
                .requestMatchers(HttpMethod.POST, "/admins/*").denyAll()
-               //Creators
+               // Creators
                .requestMatchers(HttpMethod.GET, "/creators").permitAll()
                .requestMatchers(HttpMethod.POST, "/creators").permitAll()
                .requestMatchers(HttpMethod.GET, "/creators/{username}").permitAll()
                .requestMatchers(HttpMethod.PUT, "/creators/{username}").hasRole("ADMIN")
                .requestMatchers(HttpMethod.POST, "/creators/*").hasRole("ADMIN")
-               //Projects
+               // Projects
                .requestMatchers(HttpMethod.GET, "/projects/search/findByVisibility").permitAll()
                .requestMatchers(HttpMethod.GET, "/projects/search/findByPortfolioAndVisibility").permitAll()
                .requestMatchers(HttpMethod.GET, "/projects/**").authenticated()
@@ -54,12 +54,12 @@ public class WebSecurityConfig {
                .requestMatchers(HttpMethod.PUT, "/projects/*").authenticated()
                .requestMatchers(HttpMethod.PATCH, "/projects/*").authenticated()
                .requestMatchers(HttpMethod.DELETE, "/projects/*").authenticated()
-               //Portfolios
+               // Portfolios
                .requestMatchers(HttpMethod.GET, "/portfolios/search/findByVisibility").permitAll()
                .requestMatchers(HttpMethod.GET, "/portfolios/**").authenticated()
-               //Profile
+               // Profile
                .requestMatchers(HttpMethod.POST, "/profiles").hasRole("CREATOR")
-               //Default
+               // Default
                .requestMatchers(HttpMethod.POST, "/*/*").authenticated()
                .requestMatchers(HttpMethod.PUT, "/*/*").authenticated()
                .requestMatchers(HttpMethod.PATCH, "/*/*").authenticated()
