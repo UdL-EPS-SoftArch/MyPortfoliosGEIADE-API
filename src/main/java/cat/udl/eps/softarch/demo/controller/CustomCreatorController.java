@@ -8,8 +8,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import cat.udl.eps.softarch.demo.domain.Profile;
+import org.springframework.web.bind.annotation.RestController;
 
-@RepositoryRestController
+@RestController
 public class CustomCreatorController {
 
     private CreatorRepository creatorRepository;
@@ -17,25 +20,6 @@ public class CustomCreatorController {
         this.creatorRepository = creatorRepository;
     }
 
-    // PUT creators/username
-    @PutMapping("/creators/{username}/profile")
-    @PreAuthorize("@CreatorSecurity.isOwner(principal.username, #username)")
-    public ResponseEntity<Creator> updateCreator(@PathVariable String username,
-                                                 @RequestBody Creator updated) {
-
-        Creator creator = creatorRepository.findById(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        if (updated.getProfile() != null) {
-            creator.setProfile(updated.getProfile());
-        }
-        if(updated.getEmail() !=null){
-            creator.setEmail(updated.getEmail()); 
-        }
-
-        creatorRepository.save(creator);
-        return ResponseEntity.ok(creator);
-    }
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/creators/{username}/suspend")
     public ResponseEntity<Creator> suspendCreator (@PathVariable String username) {
@@ -46,9 +30,53 @@ public class CustomCreatorController {
             creatorRepository.save(creator);
             
             return ResponseEntity.ok(creator);
-            
-
+        
     }
+
+    @PostMapping("/creators")
+public ResponseEntity<Creator> createCreator(@RequestBody Creator creator) {
+
+    Profile profile = new Profile();
+    profile.setDescription("");
+    profile.setVisibility(Profile.Visibility.PRIVATE);
+
+    creator.setProfile(profile);
+
+    Creator saved = creatorRepository.save(creator);
+
+    return ResponseEntity.ok(saved);
+}
+
+    @GetMapping("/me/profile")
+    @PreAuthorize("hasRole('CREATOR')")
+    public Profile getMyProfile(Authentication auth) {
+
+        Creator creator = creatorRepository.findById(auth.getName())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return creator.getProfile();
+    }
+
+    @PutMapping("/me/profile")
+    @PreAuthorize("hasRole('CREATOR')")
+    public Profile updateMyProfile(@RequestBody Profile updated, Authentication auth) {
+
+    Creator creator = creatorRepository.findById(auth.getName())
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+    Profile profile = creator.getProfile();
+
+    if (profile == null) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
+
+    profile.setDescription(updated.getDescription());
+    profile.setVisibility(updated.getVisibility());
+
+    creatorRepository.save(creator);
+
+    return profile;
+}
     
 
 

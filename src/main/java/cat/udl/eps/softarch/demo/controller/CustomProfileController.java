@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
-
+import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
-@RepositoryRestController("customProfileController")
+@RestController
 public class CustomProfileController {
 
     private final ProfileRepository profileRepository;
@@ -64,4 +64,5 @@ public class CustomProfileController {
                 .toList();
         return ResponseEntity.ok(publicProfiles); 
     }
+    
 }
