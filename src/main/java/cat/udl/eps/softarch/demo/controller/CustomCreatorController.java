@@ -11,6 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import cat.udl.eps.softarch.demo.domain.Profile;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.hateoas.CollectionModel;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
 
 @RestController
 public class CustomCreatorController {
@@ -56,6 +61,18 @@ public ResponseEntity<Creator> createCreator(@RequestBody Creator creator) {
 
         return creator.getProfile();
     }
+
+   @GetMapping("/creators")
+        @PreAuthorize("hasRole('ADMIN')")
+        public CollectionModel<Creator> getCreators() {
+
+            List<Creator> creators = new ArrayList<>();
+            creatorRepository.findAll().forEach(creators::add);
+
+            return CollectionModel.of(creators,
+                linkTo(methodOn(CustomCreatorController.class).getCreators()).withSelfRel()
+            );
+        }
 
     @PutMapping("/me/profile")
     @PreAuthorize("hasRole('CREATOR')")
