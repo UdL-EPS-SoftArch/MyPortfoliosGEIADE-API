@@ -31,9 +31,7 @@ public class DBInitialization {
     @PostConstruct
 public void initializeDatabase() {
 
-    // ======================
-    // 👤 DEFAULT USER (ya tienes)
-    // ======================
+
     if (!userRepository.existsById("demo")) {
         User user = new User();
         user.setEmail("demo@sample.app");
@@ -43,36 +41,26 @@ public void initializeDatabase() {
         userRepository.save(user);
     }
 
-    // ======================
-    // 👑 ADMIN
-    // ======================
     if (!userRepository.existsById("admin")) {
         Admin admin = new Admin();
-        admin.setId("admin");
         admin.setEmail("admin@sample.app");
+        admin.setId("admin");
         admin.setPassword(defaultPassword);
         admin.encodePassword();
-
         userRepository.save(admin);
     }
 
-    // ======================
-    // 🎬 CREATOR con PROFILE
-    // ======================
     if (!userRepository.existsById("creator")) {
-
         Creator creator = new Creator();
+        creator.setEmail("seed-creator@sample.app");
         creator.setId("creator");
-        creator.setEmail("creator@sample.app");
         creator.setPassword(defaultPassword);
         creator.encodePassword();
-
+        creator.setEnabled(true);
         Profile profile = new Profile();
         profile.setDescription("");
         profile.setVisibility(Profile.Visibility.PRIVATE);
-
         creator.setProfile(profile);
-
         userRepository.save(creator);
     }
 
