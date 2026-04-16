@@ -35,7 +35,7 @@ public class CustomCreatorController {
 
     @PostMapping("/creators")
 public ResponseEntity<Creator> createCreator(@RequestBody Creator creator) {
-
+    creator.encodePassword();
     Profile profile = new Profile();
     profile.setDescription("");
     profile.setVisibility(Profile.Visibility.PRIVATE);
