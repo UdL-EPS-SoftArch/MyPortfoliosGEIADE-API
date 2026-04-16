@@ -79,9 +79,9 @@ public class ContentRepositoryStepsDefs {
     @When("^I delete a Content with name \"([^\"]*)\"")
     public void iDeleteContent(String name) throws Throwable {
 
-        // 1. Buscar el contenido por nombre usando el endpoint que sí funciona
+        // Buscar el contenido por nombre usando el endpoint correcto
         MvcResult searchResult = stepDefs.mockMvc.perform(
-                get("/contents")
+                get("/contents/search/findByName")
                     .param("name", name)
                     .accept(MediaType.APPLICATION_JSON)
                     .with(AuthenticationStepDefs.authenticate()))
@@ -90,25 +90,20 @@ public class ContentRepositoryStepsDefs {
 
         String response = searchResult.getResponse().getContentAsString();
 
-        // 2. Parsear el JSON HAL
         JsonNode root = stepDefs.mapper.readTree(response);
 
-        JsonNode contents = root.path("_embedded").path("contents");
+        // Extraer el self link
+        String selfHref = root.path("_links").path("self").path("href").asText();
 
-        if (contents.isMissingNode() || !contents.isArray() || contents.size() == 0) {
+        if (selfHref == null || selfHref.isEmpty()) {
             throw new RuntimeException("No content found with name: " + name);
         }
 
-        JsonNode contentNode = contents.get(0);
-
-        // 3. Obtener el ID desde el link "self"
-        String selfHref = contentNode.path("_links").path("self").path("href").asText();
         Long idToDelete = Long.valueOf(selfHref.substring(selfHref.lastIndexOf("/") + 1));
 
-        // Guardar el ID para el siguiente step
         createdContentId = idToDelete;
 
-        // 4. Borrar el contenido por ID
+        // Borrar el contenido
         stepDefs.result = stepDefs.mockMvc.perform(
                 delete("/contents/" + idToDelete)
                     .with(AuthenticationStepDefs.authenticate())
