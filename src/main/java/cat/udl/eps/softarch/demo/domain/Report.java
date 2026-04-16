@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotBlank;
 //import jakarta.persistence.JoinColumn;
 //import jakarta.persistence.ManyToOne;
 //import jakarta.persistence.OneToMany;
@@ -36,6 +37,7 @@ public class Report {
     @JoinColumn(name = "content_id", nullable = false)
     private Content content; 
 
+    @NotBlank(message = "Reason cannot be empty")
     @org.hibernate.validator.constraints.Length(max = 100)
     @Column(length = 100)
     private String reason;
