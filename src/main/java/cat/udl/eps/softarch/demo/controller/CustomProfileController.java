@@ -25,7 +25,7 @@ public class CustomProfileController {
     }
     
     // PUT /profiles/id 
-    @PutMapping("/products/{id}")
+    @PutMapping("/profiles/{id}")
     @PreAuthorize("@profileSecurity.isOwner(principal.username, #id)")  
     @ResponseBody
     public ResponseEntity<Profile> updateProfile(@PathVariable Long id,
@@ -45,7 +45,7 @@ public class CustomProfileController {
         return ResponseEntity.ok(profile);
     }
 
-    @GetMapping("/products/{id}")
+    @GetMapping("/profiles/{id}")
     @PreAuthorize("@profileSecurity.isOwner(principal.username, #id) or @profileSecurity.isPublic(#id)")
     @ResponseBody
     public ResponseEntity<Profile> getProfile(@PathVariable Long id) {
@@ -55,7 +55,7 @@ public class CustomProfileController {
     }
 
     
-    @GetMapping("/products/")
+    @GetMapping("/profiles/")
     @ResponseBody
     public ResponseEntity<List<Profile>> getPublicProfiles() {
         List<Profile> publicProfiles = ((List<Profile>) profileRepository.findAll())

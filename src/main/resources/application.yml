@@ -3,4 +3,5 @@ default-password: password
 spring:
   h2:
     console:
-      enabled: false
+      enabled: true
+      path: /h2-console

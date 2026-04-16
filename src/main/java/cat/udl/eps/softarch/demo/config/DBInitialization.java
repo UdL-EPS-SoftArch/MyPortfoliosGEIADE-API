@@ -1,4 +1,7 @@
 package cat.udl.eps.softarch.demo.config;
+
+import cat.udl.eps.softarch.demo.domain.Admin;
+import cat.udl.eps.softarch.demo.domain.Creator;
 import cat.udl.eps.softarch.demo.domain.Record;
 import cat.udl.eps.softarch.demo.domain.User;
 import cat.udl.eps.softarch.demo.repository.RecordRepository;
@@ -12,6 +15,7 @@ import java.util.Arrays;
 
 @Configuration
 public class DBInitialization {
+
     @Value("${default-password}")
     String defaultPassword;
 
@@ -28,7 +32,10 @@ public class DBInitialization {
 
     @PostConstruct
     public void initializeDatabase() {
-        // Default user
+
+        // =========================
+        // DEFAULT USER
+        // =========================
         if (!userRepository.existsById("demo")) {
             User user = new User();
             user.setEmail("demo@sample.app");
@@ -37,8 +44,43 @@ public class DBInitialization {
             user.encodePassword();
             userRepository.save(user);
         }
+
+        // =========================
+        // ADMIN (1)
+        // =========================
+        if (!userRepository.existsById("admin")) {
+            Admin admin = new Admin();
+            admin.setId("admin");
+            admin.setEmail("admin@sample.app");
+            admin.setPassword(defaultPassword);
+            admin.encodePassword();
+            userRepository.save(admin);
+        }
+
+        // =========================
+        // CREATORS (2)
+        // =========================
+        if (!userRepository.existsById("creator1")) {
+            Creator c1 = new Creator();
+            c1.setId("creator1");
+            c1.setEmail("creator1@sample.app");
+            c1.setPassword(defaultPassword);
+            c1.encodePassword();
+            userRepository.save(c1);
+        }
+
+        if (!userRepository.existsById("creator2")) {
+            Creator c2 = new Creator();
+            c2.setId("creator2");
+            c2.setEmail("creator2@sample.app");
+            c2.setPassword(defaultPassword);
+            c2.encodePassword();
+            userRepository.save(c2);
+        }
+
+    
         if (Arrays.asList(activeProfiles.split(",")).contains("test")) {
-            // Testing instances
+
             if (!userRepository.existsById("test")) {
                 User user = new User();
                 user.setEmail("test@sample.app");
@@ -46,12 +88,14 @@ public class DBInitialization {
                 user.setPassword(defaultPassword);
                 user.encodePassword();
                 user = userRepository.save(user);
-                cat.udl.eps.softarch.demo.domain.Record record = new Record();
+
+                Record record = new Record();
                 record.setName("My test record");
                 record.setDescription("A record used for testing purposes, nothing more, nothing less...");
                 record.setCreated(ZonedDateTime.now());
                 record.setModified(record.getCreated());
                 record.setOwnedBy(user);
+
                 recordRepository.save(record);
             }
         }
