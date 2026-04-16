@@ -1,5 +1,6 @@
 package cat.udl.eps.softarch.demo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -29,10 +30,10 @@ public class Project extends UriEntity<Long> {
 
     private ZonedDateTime modified;
 
-    // Relació amb Portfolio (segons el diagrama, un Project pertany a un Portfolio)
-    //@ManyToOne
-    //@JoinColumn(name = "portfolio_id")
-    //private Portfolio portfolio;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "portfolio_id", nullable = false)
+    @JsonIdentityReference(alwaysAsId = true)
+    private Portfolio portfolio;
 
     public Project() {
         this.created = ZonedDateTime.now();
@@ -57,9 +58,5 @@ public class Project extends UriEntity<Long> {
     public void setName(String name) {this.name = name;}
 
     public void setDescription(String description) {this.description = description;}
-
-    //public void setPortfolio(Portfolio portfolio) {
-        //this.portfolio = portfolio;
-    //}
 
 }

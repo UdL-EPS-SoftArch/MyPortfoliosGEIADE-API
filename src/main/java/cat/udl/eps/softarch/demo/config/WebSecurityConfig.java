@@ -34,7 +34,7 @@ public class WebSecurityConfig {
                .requestMatchers(HttpMethod.POST, "/users").anonymous()
                .requestMatchers(HttpMethod.GET, "/users/{username}").anonymous()
                .requestMatchers(HttpMethod.POST, "/users/*").denyAll()
-               //Admins
+               // Admins
                .requestMatchers(HttpMethod.GET, "/admins").hasRole("ADMIN")
                .requestMatchers(HttpMethod.POST, "/admins").hasRole("ADMIN")
                .requestMatchers(HttpMethod.GET, "/admins/{username}").hasRole("ADMIN")
@@ -47,16 +47,23 @@ public class WebSecurityConfig {
                .requestMatchers(HttpMethod.PUT, "/creators/{username}").hasRole("ADMIN")
                .requestMatchers(HttpMethod.PUT, "/creators/*/profile").authenticated()
                .requestMatchers(HttpMethod.POST, "/creators/*").hasRole("ADMIN")
-               //Projects
+
+               // Projects
+               .requestMatchers(HttpMethod.GET, "/projects/search/findByVisibility").permitAll()
+               .requestMatchers(HttpMethod.GET, "/projects/search/findByPortfolioAndVisibility").permitAll()
+               .requestMatchers(HttpMethod.GET, "/projects/**").authenticated()
                .requestMatchers(HttpMethod.POST, "/projects").authenticated()
                .requestMatchers(HttpMethod.PUT, "/projects/*").authenticated()
+               .requestMatchers(HttpMethod.PATCH, "/projects/*").authenticated()
                .requestMatchers(HttpMethod.DELETE, "/projects/*").authenticated()
-               //Portfolios
+               // Portfolios
                .requestMatchers(HttpMethod.GET, "/portfolios/search/findByVisibility").permitAll()
+               .requestMatchers(HttpMethod.GET, "/portfolios/*/owner").permitAll()
                .requestMatchers(HttpMethod.GET, "/portfolios/**").authenticated()
-               //Profile
+               // Profile
                .requestMatchers(HttpMethod.POST, "/profiles").hasRole("CREATOR")
-               //Default
+               // Default
+
                .requestMatchers(HttpMethod.POST, "/*/*").authenticated()
                .requestMatchers(HttpMethod.PUT, "/*/*").authenticated()
                .requestMatchers(HttpMethod.PATCH, "/*/*").authenticated()
