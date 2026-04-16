@@ -46,6 +46,7 @@ public class WebSecurityConfig {
                .requestMatchers(HttpMethod.GET, "/creators/{username}").permitAll()
                .requestMatchers(HttpMethod.PUT, "/creators/{username}").hasRole("ADMIN")
                .requestMatchers(HttpMethod.POST, "/creators/*").hasRole("ADMIN")
+
                // Projects
                .requestMatchers(HttpMethod.GET, "/projects/search/findByVisibility").permitAll()
                .requestMatchers(HttpMethod.GET, "/projects/search/findByPortfolioAndVisibility").permitAll()
@@ -60,6 +61,7 @@ public class WebSecurityConfig {
                // Profile
                .requestMatchers(HttpMethod.POST, "/profiles").hasRole("CREATOR")
                // Default
+
                .requestMatchers(HttpMethod.POST, "/*/*").authenticated()
                .requestMatchers(HttpMethod.PUT, "/*/*").authenticated()
                .requestMatchers(HttpMethod.PATCH, "/*/*").authenticated()
