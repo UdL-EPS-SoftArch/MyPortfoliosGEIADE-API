@@ -57,6 +57,7 @@ public class WebSecurityConfig {
                .requestMatchers(HttpMethod.DELETE, "/projects/*").authenticated()
                // Portfolios
                .requestMatchers(HttpMethod.GET, "/portfolios/search/findByVisibility").permitAll()
+               .requestMatchers(HttpMethod.GET, "/portfolios/*/owner").permitAll()
                .requestMatchers(HttpMethod.GET, "/portfolios/**").authenticated()
                // Profile
                .requestMatchers(HttpMethod.POST, "/profiles").hasRole("CREATOR")
