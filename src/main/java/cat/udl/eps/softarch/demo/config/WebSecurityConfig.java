@@ -40,11 +40,12 @@ public class WebSecurityConfig {
                .requestMatchers(HttpMethod.GET, "/admins/{username}").hasRole("ADMIN")
                .requestMatchers(HttpMethod.POST, "/admins/*/suspend").hasRole("ADMIN")
                .requestMatchers(HttpMethod.POST, "/admins/*").denyAll()
-               // Creators
-               .requestMatchers(HttpMethod.GET, "/creators").permitAll()
-               .requestMatchers(HttpMethod.POST, "/creators").permitAll()
+               //Creators
+               .requestMatchers(HttpMethod.GET, "/creators").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/creators").permitAll()
                .requestMatchers(HttpMethod.GET, "/creators/{username}").permitAll()
                .requestMatchers(HttpMethod.PUT, "/creators/{username}").hasRole("ADMIN")
+               .requestMatchers(HttpMethod.PUT, "/creators/*/profile").authenticated()
                .requestMatchers(HttpMethod.POST, "/creators/*").hasRole("ADMIN")
 
                // Projects
