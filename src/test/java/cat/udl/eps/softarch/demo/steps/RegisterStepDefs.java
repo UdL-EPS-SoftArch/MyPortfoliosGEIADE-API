@@ -2,110 +2,153 @@ package cat.udl.eps.softarch.demo.steps;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.http.MediaType;
 
+import cat.udl.eps.softarch.demo.domain.Creator;
+import cat.udl.eps.softarch.demo.domain.Profile;
 import cat.udl.eps.softarch.demo.domain.User;
+import cat.udl.eps.softarch.demo.repository.CreatorRepository;
 import cat.udl.eps.softarch.demo.repository.UserRepository;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.json.JSONObject;
-import org.junit.jupiter.api.Assertions.*;
-import org.springframework.http.MediaType;
-
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 public class RegisterStepDefs {
-  private final StepDefs stepDefs;
-  private final UserRepository userRepository;
 
-  public RegisterStepDefs(StepDefs stepDefs, UserRepository userRepository) {
-    this.stepDefs = stepDefs;
-    this.userRepository = userRepository;
-  }
+    private final StepDefs stepDefs;
+    private final CreatorRepository creatorRepository;
 
-  @Given("^There is no registered user with username \"([^\"]*)\"$")
-  public void thereIsNoRegisteredUserWithUsername(String user) {
-    assertFalse(userRepository.existsById(user), "User \"" + user + "\"shouldn't exist");
-  }
-
-  @Given("^There is a registered user with username \"([^\"]*)\" and password \"([^\"]*)\" and email \"([^\"]*)\"$")
-  public void thereIsARegisteredUserWithUsernameAndPasswordAndEmail(String username, String password, String email) {
-    if (!userRepository.existsById(username)) {
-      User user = new User();
-      user.setEmail(email);
-      user.setId(username);
-      user.setPassword(password);
-      user.encodePassword();
-      userRepository.save(user);
+    public RegisterStepDefs(StepDefs stepDefs, CreatorRepository creatorRepository) {
+        this.stepDefs = stepDefs;
+        this.creatorRepository = creatorRepository;
     }
-  }
 
-  @And("^I can login with username \"([^\"]*)\" and password \"([^\"]*)\"$")
-  public void iCanLoginWithUsernameAndPassword(String username, String password) throws Throwable {
-    AuthenticationStepDefs.currentUsername = username;
-    AuthenticationStepDefs.currentPassword = password;
+    // ----------------- GIVEN -----------------
+    @Given("^There is no registered creator with username \"([^\"]*)\"$")
+    public void thereIsNoRegisteredCreatorWithUsername(String username) {
+        //salta error q lelimina direcatament
+        creatorRepository.findById(username)
+        .ifPresent(creator -> creatorRepository.delete(creator));
 
-    stepDefs.result = stepDefs.mockMvc.perform(
-        get("/identity", username)
-            .accept(MediaType.APPLICATION_JSON)
-            .with(AuthenticationStepDefs.authenticate()))
-        .andDo(print())
-        .andExpect(status().isOk());
-  }
+        assertFalse(creatorRepository.existsById(username), "Creator \"" + username + "\" shouldn't exist");
+    }
 
-  @And("^I cannot login with username \"([^\"]*)\" and password \"([^\"]*)\"$")
-  public void iCannotLoginWithUsernameAndPassword(String username, String password) throws Throwable {
-    AuthenticationStepDefs.currentUsername = username;
-    AuthenticationStepDefs.currentPassword = password;
+    @Given("^There is a registered creator with username \"([^\"]*)\" and password \"([^\"]*)\" and email \"([^\"]*)\"$")
+    public void thereIsARegisteredCreatorWithUsernameAndPasswordAndEmail(String username, String password, String email) {
+        if (!creatorRepository.existsById(username)) {
+            Creator creator = new Creator();
+            creator.setUsername(username);
+            creator.setEmail(email);
+            creator.setPassword(password);
+            creator.encodePassword();
+            creator.setEnabled(true);
+            Profile profile = new Profile();
+            creator.setProfile(profile);
+            creatorRepository.save(creator);
+        }
+    }
 
-    stepDefs.result = stepDefs.mockMvc.perform(
-        get("/identity", username)
-            .accept(MediaType.APPLICATION_JSON)
-            .with(AuthenticationStepDefs.authenticate()))
-        .andDo(print())
-        .andExpect(status().isUnauthorized());
-  }
 
-  @When("^I register a new user with username \"([^\"]*)\", email \"([^\"]*)\" and password \"([^\"]*)\"$")
-  public void iRegisterANewUserWithUsernameEmailAndPassword(String username, String email, String password) throws Throwable {
-    User user = new User();
-    user.setId(username);
-    user.setEmail(email);
+    // ----------------- WHEN -----------------
+    @When("^I register a new creator with username \"([^\"]*)\", email \"([^\"]*)\" and password \"([^\"]*)\"$")
+    public void iRegisterANewCreatorWithUsernameEmailAndPassword(String username, String email, String password) throws Exception {
+        Creator creator = new Creator();
+        creator.setUsername(username);
+        creator.setEmail(email);
 
-    stepDefs.result = stepDefs.mockMvc.perform(
-            post("/users")
-                    .contentType(MediaType.APPLICATION_JSON)
+
+        stepDefs.result = stepDefs.mockMvc.perform(
+                post("/creators")
+                        .contentType(MediaType.APPLICATION_JSON)
                     .content(new JSONObject(
-                            stepDefs.mapper.writeValueAsString(user)
+                            stepDefs.mapper.writeValueAsString(creator)
                     ).put("password", password).toString())
                     .characterEncoding(StandardCharsets.UTF_8)
                     .accept(MediaType.APPLICATION_JSON)
                     .with(AuthenticationStepDefs.authenticate()))
             .andDo(print());
-  }
+    }
 
-  @And("^It has been created a user with username \"([^\"]*)\" and email \"([^\"]*)\", the password is not returned$")
-  public void itHasBeenCreatedAUserWithUsername(String username, String email) throws Throwable {
-    stepDefs.result = stepDefs.mockMvc.perform(
-            get("/users/{username}", username)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .with(AuthenticationStepDefs.authenticate()))
-            .andDo(print())
-            .andExpect(jsonPath("$.email", is(email)))
-            .andExpect(jsonPath("$.password").doesNotExist());
-  }
+    // ----------------- THEN / AND -----------------
+    @And("^It has been created a creator with username \"([^\"]*)\" and email \"([^\"]*)\", the password is not returned$")
+    public void itHasBeenCreatedACreatorWithUsername(String username, String email) throws Exception {
+        stepDefs.result = stepDefs.mockMvc.perform(
+                get("/creators/{username}", username)
+                        .accept("application/json")
+                        .with(AuthenticationStepDefs.authenticate())
+        ).andDo(print())
+         .andExpect(jsonPath("$.email", is(email)))
+         .andExpect(jsonPath("$.password").doesNotExist());
+    }
 
-  @And("^It has not been created a user with username \"([^\"]*)\"$")
-  public void itHasNotBeenCreatedAUserWithUsername(String username) throws Throwable {
-    stepDefs.result = stepDefs.mockMvc.perform(
-            get("/users/{username}", username)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .with(AuthenticationStepDefs.authenticate()))
-            .andExpect(status().isNotFound());
-  }
+    @And("^It has not been created a creator with username \"([^\"]*)\"$")
+    public void itHasNotBeenCreatedACreatorWithUsername(String username) throws Exception {
+        stepDefs.result = stepDefs.mockMvc.perform(
+                get("/creators/{username}", username)
+                        .accept("application/json")
+                        .with(AuthenticationStepDefs.authenticate())
+        ).andExpect(status().isNotFound());
+    }
+
+    @And("^I can login with username \"([^\"]*)\" and password \"([^\"]*)\"$")
+    public void iCanLoginWithUsernameAndPassword(String username, String password) throws Exception {
+        AuthenticationStepDefs.currentUsername = username;
+        AuthenticationStepDefs.currentPassword = password;
+
+        stepDefs.result = stepDefs.mockMvc.perform(
+                get("/identity")
+                        .accept("application/json")
+                        .with(AuthenticationStepDefs.authenticate())
+        ).andDo(print())
+         .andExpect(status().isOk());
+    }
+
+    @And("^I cannot login with username \"([^\"]*)\" and password \"([^\"]*)\"$")
+    public void iCannotLoginWithUsernameAndPassword(String username, String password) throws Exception {
+        AuthenticationStepDefs.currentUsername = username;
+        AuthenticationStepDefs.currentPassword = password;
+
+        stepDefs.result = stepDefs.mockMvc.perform(
+                get("/identity")
+                        .accept("application/json")
+                        .with(AuthenticationStepDefs.authenticate())
+        ).andDo(print())
+         .andExpect(status().isUnauthorized());
+    }
+
+    @And("There is no creator with username \"([^\"]*)\"")
+    public void thereIsNoCreatorWithUsername(String username) throws Exception {
+        stepDefs.result = stepDefs.mockMvc.perform(
+                get("/creators/{username}", username)
+                        .accept("application/json")
+                        .with(AuthenticationStepDefs.authenticate())
+        ).andExpect(status().isNotFound());
+    }
+
+    @Then("There is no creator with username {string}")
+    public void there_is_no_creator_with_username(String username) {
+        assertFalse(creatorRepository.existsById(username), "Creator \"" + username + "\" should not exist");
+    }
+
+    @And("^There is still only one creator with username \"([^\"]*)\"$")
+    public void thereIsStillOnlyOneCreatorWithUsername(String username) {
+        long count = 0;
+        for (Creator c : creatorRepository.findAll()) {
+            if (username.equals(c.getUsername())) {
+                count++;
+            }
+        }
+        assertEquals(1, count, "There should still be only one creator with username \"" + username + "\"");
+    }
 }
