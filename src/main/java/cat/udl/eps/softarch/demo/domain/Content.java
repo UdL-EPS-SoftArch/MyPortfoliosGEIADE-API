@@ -4,14 +4,22 @@ import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 
-import jakarta.persistence.*;
-//import jakarta.persistence.JoinColumn;
-//import jakarta.persistence.ManyToOne;
-import lombok.Data;
-//import lombok.EqualsAndHashCode;
-/*
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import com.fasterxml.jackson.annotation.JsonIdentityReference; */
+import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import java.util.List;
 
 
@@ -35,12 +43,10 @@ public class Content {
     @ManyToOne
     @JoinColumn(nullable = false)
     @JsonIdentityReference(alwaysAsId = true)
-    private User user;
-
-    @OneToMany(mappedBy = "content")
-    @JsonIdentityReference(alwaysAsId = true)
-    private List<Report> reports;
+    @Column(nullable = false)
+    private User user;*/
     
+    @NotBlank(message = "Name cannot be empty")
     @Column(unique = true, nullable = false)
     private String name;
 
