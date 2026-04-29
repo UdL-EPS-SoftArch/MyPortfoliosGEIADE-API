@@ -32,7 +32,7 @@ public class WebSecurityConfig {
                // Users
                .requestMatchers(HttpMethod.GET, "/users").authenticated()
                .requestMatchers(HttpMethod.POST, "/users").anonymous()
-               .requestMatchers(HttpMethod.GET, "/users/{username}").anonymous()
+               .requestMatchers(HttpMethod.GET, "/users/{username}").authenticated()
                .requestMatchers(HttpMethod.POST, "/users/*").denyAll()
                // Admins
                .requestMatchers(HttpMethod.GET, "/admins").hasRole("ADMIN")
