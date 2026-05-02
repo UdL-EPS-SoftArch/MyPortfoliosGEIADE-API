@@ -1,5 +1,6 @@
 package cat.udl.eps.softarch.demo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -24,7 +25,4 @@ public class Tag extends UriEntity<Long> {
     private ZonedDateTime created;
 
     private ZonedDateTime modified;
-
-    //@ManyToMany(mappedBy = "tags")
-    //private Set<Content> contentSet = new HashSet<>();
 }
