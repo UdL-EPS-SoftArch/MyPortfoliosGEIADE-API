@@ -60,6 +60,9 @@ public class WebSecurityConfig {
                .requestMatchers(HttpMethod.GET, "/portfolios/search/findByVisibility").permitAll()
                .requestMatchers(HttpMethod.GET, "/portfolios/*/owner").permitAll()
                .requestMatchers(HttpMethod.GET, "/portfolios/**").authenticated()
+               // Tags
+               .requestMatchers(HttpMethod.POST, "/tags").hasRole("ADMIN")
+               .requestMatchers(HttpMethod.DELETE, "/tags/*").hasRole("ADMIN")
                // Profile
                .requestMatchers(HttpMethod.POST, "/profiles").hasRole("CREATOR")
                // Default
