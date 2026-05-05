@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;  
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -61,5 +62,16 @@ public class Content {
 
     @Enumerated(EnumType.STRING) 
     @Column(nullable = false) private Visibility visibility;
+
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null) {
+            createdAt = ZonedDateTime.now();
+        }
+        if (modifiedAt == null) {
+            modifiedAt = ZonedDateTime.now();
+        }
+    }
+
     
 }
