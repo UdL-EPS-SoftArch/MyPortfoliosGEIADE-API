@@ -2,7 +2,6 @@ package cat.udl.eps.softarch.demo.domain;
 
 import java.time.ZonedDateTime;
 
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

@@ -7,11 +7,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import cat.udl.eps.softarch.demo.DemoApplication;
+import cat.udl.eps.softarch.demo.domain.User;
+import cat.udl.eps.softarch.demo.repository.UserRepository;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import io.cucumber.spring.CucumberContextConfiguration;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootContextLoader;
@@ -34,18 +39,21 @@ import org.springframework.web.context.WebApplicationContext;
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
 @ActiveProfiles("test")
-@CucumberContextConfiguration
+//@CucumberContextConfiguration
 public class StepDefs {
 
-    protected final WebApplicationContext wac;
-    protected MockMvc mockMvc;
-    protected ResultActions result;
-    protected ObjectMapper mapper = new ObjectMapper();
+    protected final WebApplicationContext wac; // Provides access to the Spring application context for testing
+    protected final UserRepository userRepository;
+    protected MockMvc mockMvc; // Permits performing HTTP requests in tests
+    protected ResultActions result; // Stores the result of a request to assert on it later.
+    protected ObjectMapper mapper = new ObjectMapper(); // Converts objects JAVA <-> JSON
 
-    public StepDefs(WebApplicationContext wac) {
+    public StepDefs(WebApplicationContext wac, UserRepository userRepository) {
         this.wac = wac;
+        this.userRepository = userRepository;
     }
 
+    // Like BeforeEach in JUnit, runs before each scenario. 
     @Before
     public void setup() {
         this.mockMvc = MockMvcBuilders
@@ -53,6 +61,18 @@ public class StepDefs {
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
         this.mapper.registerModule(new JavaTimeModule());
+    }
+
+    @Given("There is a registered user with username {string} and password {string} and email {string}")
+    public void there_is_a_registered_user_with_username_and_password_and_email(String username, String password, String email) {
+        if (!userRepository.existsById(username)) {
+            User user = new User();
+            user.setUsername(username);
+            user.setEmail(email);
+            user.setPassword(password);
+            user.encodePassword();
+            userRepository.save(user);
+        }
     }
 
     @Then("^The response code is (\\d+)$")
@@ -67,4 +87,5 @@ public class StepDefs {
         else
             result.andExpect(jsonPath("$..message", hasItem(containsString(message))));
     }
+
 }
