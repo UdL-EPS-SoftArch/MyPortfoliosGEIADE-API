@@ -1,5 +1,15 @@
 # MyPortfolios GEIADE API
 
+## Run locally
+
+On Windows PowerShell, use the Maven wrapper included in this repository:
+
+```powershell
+.\mvnw.cmd spring-boot:run
+```
+
+If you prefer a global Maven installation, `mvn spring-boot:run` also works once `mvn` is available on your `PATH`.
+
 Template for a Spring Boot project including Spring REST, HATEOAS, JPA, etc. Additional details: [HELP.md](HELP.md)
 
 [![Open Issues](https://img.shields.io/github/issues-raw/UdL-EPS-SoftArch/MyPortfoliosGEIADE-API?logo=github)](https://github.com/orgs/UdL-EPS-SoftArch/projects/28)

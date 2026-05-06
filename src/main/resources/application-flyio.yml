@@ -1,4 +1,4 @@
-allowed-origins: "https://react-template.netlify.app,https://deploy-preview-*--react-template.netlify.app"
+allowed-origins: "https://my-portfolios-geiade.vercel.app,https://my-portfolios-geiade-*.vercel.app"
 
 logging:
     level:

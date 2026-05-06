@@ -7,6 +7,7 @@ import cat.udl.eps.softarch.demo.repository.UserRepository;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
+import io.cucumber.java.en.Then;
 import org.springframework.http.MediaType;
 
 import java.nio.charset.StandardCharsets;
@@ -86,8 +87,20 @@ public class PortfolioStepDefs {
 
     @When("^I request my portfolios$")
     public void iRequestMyPortfolios() throws Throwable {
-        String username = AuthenticationStepDefs.currentUsername;
-        User owner = userRepository.findById(username).orElseThrow();
+
+        if (AuthenticationStepDefs.currentUsername == null) {
+            // Sin login → usar endpoint general
+            stepDefs.result = stepDefs.mockMvc.perform(
+                    get("/portfolios")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .with(AuthenticationStepDefs.authenticate()))
+                .andDo(print());
+            return;
+        }
+
+        // Con login → comportamiento actual
+        User owner = userRepository.findById(AuthenticationStepDefs.currentUsername).orElseThrow();
 
         stepDefs.result = stepDefs.mockMvc.perform(
                 get("/portfolios/search/findByOwner?owner={ownerUri}", owner.getUri())
@@ -188,4 +201,63 @@ public class PortfolioStepDefs {
                     .with(AuthenticationStepDefs.authenticate()))
             .andDo(print());
     }
+
+    @When("^I create a new portfolio with name \"([^\"]*)\" and visibility \"([^\"]*)\"$")
+    public void iCreateANewPortfolioWithNameAndVisibility(String name, String visibility) throws Throwable {
+        Portfolio portfolio = new Portfolio();
+        portfolio.setName(name);
+        portfolio.setVisibility(cat.udl.eps.softarch.demo.domain.Visibility.valueOf(visibility));
+
+        stepDefs.result = stepDefs.mockMvc.perform(
+                post("/portfolios")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(stepDefs.mapper.writeValueAsString(portfolio))
+                    .characterEncoding(StandardCharsets.UTF_8)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(AuthenticationStepDefs.authenticate()))
+            .andDo(print());
+
+        this.lastPortfolioUri = stepDefs.result.andReturn().getResponse().getHeader("Location");
+    }
+
+    @When("^I request public portfolios$")
+    public void iRequestPublicPortfolios() throws Throwable {
+
+        stepDefs.result = stepDefs.mockMvc.perform(
+                get("/portfolios/search/findByVisibility?visibility=PUBLIC")
+                    .accept(MediaType.APPLICATION_JSON)
+                    .characterEncoding(StandardCharsets.UTF_8)
+                    .with(AuthenticationStepDefs.authenticate()))
+            .andDo(print());
+    }
+
+    @When("^I request public portfolios of \"([^\"]*)\"$")
+    public void iRequestPublicPortfoliosOf(String username) throws Throwable {
+        User owner = userRepository.findById(username).orElseThrow();
+
+        stepDefs.result = stepDefs.mockMvc.perform(
+                get("/portfolios/search/findByOwnerAndVisibility?owner={ownerUri}&visibility=PUBLIC", owner.getUri())
+                    .accept(MediaType.APPLICATION_JSON)
+                    .characterEncoding(StandardCharsets.UTF_8)
+                    .with(AuthenticationStepDefs.authenticate()))
+            .andDo(print());
+    }
+
+    @Then("^The portfolio visibility is \"([^\"]*)\"$")
+    public void thePortfolioVisibilityIs(String expectedVisibility) throws Throwable {
+
+        assertNotNull(this.lastPortfolioUri, "No portfolio URI available");
+
+        stepDefs.result = stepDefs.mockMvc.perform(
+                get(this.lastPortfolioUri)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .characterEncoding(StandardCharsets.UTF_8)
+                    .with(AuthenticationStepDefs.authenticate()))
+            .andDo(print())
+            .andExpect(jsonPath("$.visibility", is(expectedVisibility)));
+    }
+
+
+
+
 }

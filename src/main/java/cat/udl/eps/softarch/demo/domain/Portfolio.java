@@ -23,7 +23,7 @@ public class Portfolio extends UriEntity<Long> {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    private Visibility visibility;
+    private Visibility visibility = Visibility.PRIVATE;
 
     @Column(nullable = false, updatable = false)
     private ZonedDateTime created;

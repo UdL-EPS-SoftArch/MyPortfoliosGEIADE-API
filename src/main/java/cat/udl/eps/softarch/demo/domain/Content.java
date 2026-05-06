@@ -4,17 +4,7 @@ import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;  
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -38,10 +28,17 @@ public class Content {
     @Column(nullable = false)
     private Project project;*/
 
-    /*@ManyToOne
-    @JsonIdentityReference(alwaysAsId = true)
-    @Column(nullable = false)
-    private User user;*/
+    @ManyToMany
+    @JoinTable(
+        name = "content_tags",
+        joinColumns = @JoinColumn(name = "content_id"),
+        inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<Tag> tags;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
     
     @NotBlank(message = "Name cannot be empty")
     @Column(unique = true, nullable = false)
@@ -54,24 +51,10 @@ public class Content {
     @Column(length = 100)
     private String description;
 
-    @Column(nullable = false, updatable = false)
     private ZonedDateTime createdAt;
 
-    @Column(nullable = false, updatable = false)
     private ZonedDateTime modifiedAt;
 
     @Enumerated(EnumType.STRING) 
     @Column(nullable = false) private Visibility visibility;
-
-    @PrePersist
-    public void prePersist() {
-        if (createdAt == null) {
-            createdAt = ZonedDateTime.now();
-        }
-        if (modifiedAt == null) {
-            modifiedAt = ZonedDateTime.now();
-        }
-    }
-
-    
 }
