@@ -20,6 +20,8 @@ import lombok.Data;
 //import jakarta.persistence.ManyToOne;
 //import com.fasterxml.jackson.annotation.JsonIdentityReference;
 
+import jakarta.persistence.PrePersist;
+
 
 @Entity
 @Data
@@ -44,4 +46,9 @@ public class Report {
 
     @Column(nullable = false, updatable = false)
     private ZonedDateTime createdAt;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = ZonedDateTime.now();
+    }
 }
